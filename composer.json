@@ -1,0 +1,43 @@
+{
+    "name": "ernestdefoe/gridiron-nation",
+    "description": "GridIron Nation — College football fan forum theme for Flarum 2. Crimson & DM Sans, organic radius, dark mode, live score widget.",
+    "type": "flarum-extension",
+    "keywords": ["flarum", "theme", "college football", "gridiron", "sports"],
+    "homepage": "https://github.com/ernestdefoe/gridiron-nation",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ernestdefoe",
+            "email": "ernestdefoe@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "flarum/core": "^2.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "suggest": {
+        "ramon/colored": "Per-tag color tinting on the hero + discussion list border stripes. GridIron Nation wires the data-colored-border=left/full integration without competing with the hero gradient.",
+        "ernestdefoe/recruiting": "Powers the Top Recruits sidebar widget with live CollegeFootballData.com data + On3 photo headshots. Without this extension installed, the widget is hidden.",
+        "flarum/realtime": "Self-hosted websocket daemon for live discussion list / notification / typing-indicator updates. GridIron Nation hides the 'N updates available' banner so the list refreshes silently."
+    },
+    "autoload": {
+        "psr-4": {
+            "Ernestdefoe\\GridironNation\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "GridIron Nation",
+            "category": "theme",
+            "icon": {
+                "name": "fas fa-football",
+                "backgroundColor": "#B22222",
+                "color": "#fff"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

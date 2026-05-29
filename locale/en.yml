@@ -1,0 +1,75 @@
+ernestdefoe-gridiron-nation:
+  admin:
+    settings:
+      title: GridIron Nation Theme
+
+      widget_live_scores: "Show Live Scores widget"
+      widget_live_scores_help: "Sidebar widget that polls ESPN for in-progress college football scores."
+      widget_trending: "Show Trending widget"
+      widget_trending_help: "Sidebar widget that lists the five most recently active discussions."
+      widget_top_recruits: "Show Top Recruits widget"
+      widget_top_recruits_help: "Sidebar widget that pulls recruiting data from the ernestdefoe/recruiting extension. Requires that extension to be installed and a CFBD API key configured."
+
+      hero_deco_enabled: "Show FontAwesome decoration in discussion hero"
+      hero_deco_enabled_help: "Anchors a large semi-transparent FontAwesome glyph to the right side of every discussion hero, pulled from any secondary (child) tag's icon. Set the icon per-tag in the Flarum Tags admin panel."
+      hero_deco_icon_count: "Number of decoration icons"
+      hero_deco_icon_count_help: "Up to 2 icons on desktop (≥ 768px viewport). Tablet and phone always show a single icon to avoid layout compression."
+      hero_deco_opacity: "Decoration icon opacity (0–100)"
+      hero_deco_opacity_help: "Percentage opacity for the glyph against the hero background. Default 12. Set to 0 to hide without disabling the feature."
+
+  forum:
+    discussion:
+      # GNDiscussionCard footer stats + overflow link.
+      # Flarum's translator uses ICU MessageFormat for pluralization;
+      # `{count, plural, ...}` lets a single key render "1 other reply"
+      # vs "5 other replies" without two keys.
+      likes: "{count, plural, =0{likes} one{like} other{likes}}"
+      replies: "{count, plural, =0{replies} one{reply} other{replies}}"
+      see_other_replies: "See {count, plural, one{# other reply} other{# other replies}}"
+      # Reply pill in the showcase card header. Flarum 1.x exposed
+      # core.forum.discussion_list.reply_link, but the key was dropped
+      # in core 2.x — we own the string here so the button has a label
+      # regardless of which core version ships it.
+      reply: Reply
+
+    nav:
+      discussions: Discussions
+      start_discussion: Start a Discussion
+
+    composer:
+      prompt: "Tell everyone what you're working on…"
+      guest_prompt: "Sign in to start a discussion…"
+
+    hero:
+      stats:
+        members: MEMBERS
+        topics: TOPICS
+        posts: POSTS
+        online: ONLINE
+        newest: NEWEST
+      chips:
+        all: All
+
+    widgets:
+      live_scores: Live Scores
+      live_scores_unavailable: Scores unavailable
+      live_scores_empty: No games today
+      live_badge: LIVE
+
+      trending: Trending
+      trending_empty: No discussions yet
+
+      recruits: Top Recruits
+      recruits_empty: No recruits in the feed yet
+      recruits_unconfigured: "Add a CollegeFootballData.com API key in the GridIron Nation Recruiting admin panel."
+      recruits_unavailable: Recruits unavailable
+
+      online_now: Online Now
+      online_empty: No one online right now
+
+    recruits:
+      status:
+        committed: Committed
+        committed_to: "→ {school}"
+        undecided: Undecided
+        decommitted: Decommitted
