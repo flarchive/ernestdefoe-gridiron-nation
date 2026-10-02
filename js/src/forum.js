@@ -1,0 +1,359 @@
+import app from 'flarum/forum/app';
+import { extend, override } from 'flarum/common/extend';
+import classList from 'flarum/common/utils/classList';
+import Model from 'flarum/common/Model';
+import Discussion from 'flarum/common/models/Discussion';
+import IndexPage          from 'flarum/forum/components/IndexPage';
+import IndexSidebar       from 'flarum/forum/components/IndexSidebar';
+import WelcomeHero        from 'flarum/forum/components/WelcomeHero';
+import DiscussionHero     from 'flarum/forum/components/DiscussionHero';
+import DiscussionListItem from 'flarum/forum/components/DiscussionListItem';
+
+import LiveScoresWidget  from './forum/components/LiveScoresWidget';
+import TrendingWidget    from './forum/components/TrendingWidget';
+import TopRecruitsWidget from './forum/components/TopRecruitsWidget';
+import GridIronHero      from './forum/components/GridIronHero';
+import GNHeroNav         from './forum/components/GNHeroNav';
+import GNComposerTrigger from './forum/components/GNComposerTrigger';
+import GNDiscussionCard  from './forum/components/GNDiscussionCard';
+
+/**
+ * Measure the rightmost hero-decoration glyph's real ink overflow and expose
+ * it as the `--gn-deco-inset` custom property on the icons container, so the
+ * CSS can pull the glyph in by exactly the amount it bleeds past its box.
+ *
+ * Why this is needed: fa-kit team glyphs render at wildly different widths —
+ * a wordmark like `fa-lsu` is ~3x its constrained icon box, while a compact
+ * logo like `fa-alabama-athletics-logo-svg` is smaller than the box. The
+ * glyph is centred in its box, so it overflows `(naturalWidth - boxWidth)/2`
+ * on each side. Insetting the rightmost glyph by its right overflow keeps
+ * wide wordmarks fully on-screen AND lets compact logos sit near the edge —
+ * a single fixed margin can't do both.
+ *
+ * The natural width is read by cloning the <i> into an unconstrained
+ * inline-block (its box collapses to the glyph's true advance). Fonts must be
+ * loaded first, or the glyph measures at its fallback width.
+ */
+function gnMeasureDecoInset(container) {
+  if (!container || !container.querySelectorAll) return;
+  const icons = container.querySelectorAll('.GN-discussionHero-icon');
+  if (!icons.length) return;
+  const glyph = icons[icons.length - 1].querySelector('i');
+  if (!glyph) return;
+
+  const clone = glyph.cloneNode(true);
+  Object.assign(clone.style, {
+    position: 'absolute', left: '-9999px', top: '0', display: 'inline-block',
+    width: 'auto', minWidth: '0', maxWidth: 'none', margin: '0', padding: '0',
+    lineHeight: '1', fontSize: getComputedStyle(glyph).fontSize,
+  });
+  document.body.appendChild(clone);
+  const naturalW = clone.getBoundingClientRect().width;
+  clone.remove();
+
+  const boxW = glyph.getBoundingClientRect().width;
+  const inset = Math.max(0, (naturalW - boxW) / 2);
+  container.style.setProperty('--gn-deco-inset', inset.toFixed(1) + 'px');
+}
+
+/**
+ * Decide which tag icons (if any) decorate a discussion hero, and at what
+ * opacity. Returns `{ picked, opacity }` or null when decoration is disabled,
+ * the discussion has no icon-bearing tags, or opacity is dialed to 0.
+ *
+ * Prefers SECONDARY tags (those with a parent), falling back to ANY tag with
+ * an icon so flat tag setups still get decoration. Renders up to 2 icons
+ * (hero_deco_icon_count), but only on viewports ≥ 768px — phone/tablet get 1.
+ */
+function gnPickDecoTags(discussion) {
+  if (app.forum.attribute('gridiron-nation.hero_deco_enabled') === false) return null;
+  if (!discussion) return null;
+
+  const tags = (discussion.tags && discussion.tags()) || [];
+  const withIcon = tags.filter((t) => t && typeof t.icon === 'function' && t.icon());
+  if (!withIcon.length) return null;
+
+  const secondary = withIcon.filter((t) => typeof t.parent === 'function' && !!t.parent());
+  const candidates = secondary.length ? secondary : withIcon;
+
+  const wideEnoughForTwo = typeof window !== 'undefined' && window.innerWidth > 767;
+  const requestedCount = Math.min(2, Math.max(1,
+    parseInt(app.forum.attribute('gridiron-nation.hero_deco_icon_count'), 10) || 2
+  ));
+  const picked = candidates.slice(0, wideEnoughForTwo ? requestedCount : 1);
+  if (!picked.length) return null;
+
+  // Default opacity 35% — the original 12% was so faint on a real install
+  // operators thought the feature wasn't firing. 0 hides the decoration.
+  const opacityRaw = parseInt(app.forum.attribute('gridiron-nation.hero_deco_opacity'), 10);
+  const opacity = isNaN(opacityRaw) ? 35 : Math.min(100, Math.max(0, opacityRaw));
+  if (opacity === 0) return null;
+
+  return { picked, opacity };
+}
+
+/**
+ * Build the absolute-positioned decoration vnode for the picked tag icons.
+ * The lifecycle hooks (re)measure the glyph overflow inset whenever fonts
+ * load, the viewport resizes, or the hero re-renders for another discussion.
+ */
+function gnDecoVnode(picked, opacity) {
+  return m('.GN-discussionHero-icons',
+    {
+      'aria-hidden': 'true',
+      'data-icon-count': picked.length,
+      style: { '--gn-deco-opacity': (opacity / 100).toFixed(2) },
+      oncreate(vnode) {
+        const run = () => gnMeasureDecoInset(vnode.dom);
+        // Glyph has its real width only once the kit font is loaded.
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(run);
+        else run();
+        // Font-size is viewport-clamped, so the overflow scales — recompute
+        // on resize. Debounced; listener removed in onremove.
+        vnode.state.gnResize = () => {
+          clearTimeout(vnode.state.gnTimer);
+          vnode.state.gnTimer = setTimeout(run, 120);
+        };
+        window.addEventListener('resize', vnode.state.gnResize);
+      },
+      // Re-measure when the hero re-renders for a different discussion
+      // (Mithril reuses this DOM node, so oncreate won't fire again).
+      onupdate(vnode) { gnMeasureDecoInset(vnode.dom); },
+      onremove(vnode) {
+        if (vnode.state.gnResize) window.removeEventListener('resize', vnode.state.gnResize);
+        clearTimeout(vnode.state.gnTimer);
+      },
+    },
+    picked.map((tag, i) =>
+      m('span.GN-discussionHero-icon', {
+        key: tag.id ? tag.id() : i,
+        style: tag.color && tag.color() ? { '--gn-deco-color': tag.color() } : null,
+      },
+        m('i', { className: tag.icon() })
+      )
+    )
+  );
+}
+
+/**
+ * Forum-frontend wiring.
+ *
+ * Layout (PageStructure-rendered, top to bottom):
+ *
+ *   .Page-hero
+ *     <WelcomeHero>            — title, subtitle, stats, composer trigger
+ *     <GNHeroNav>               — pill nav row, OUTSIDE the gradient
+ *   .Page-container
+ *     .Page-content              — discussion list (toolbar + DiscussionList)
+ *     .Page-sidebar              — IndexSidebar (hidden chrome) + widget stack
+ *
+ * Visual extras layered on top:
+ *   - WelcomeHero bodyItems    — football-pattern SVG + yard-line band
+ *   - DiscussionHero bodyItems — semi-transparent FA tag icon at right
+ *   - GridIronHero stats       — ONLINE tile opens a dropdown of online users
+ */
+app.initializers.add('ernestdefoe-gridiron-nation', () => {
+
+  // ── 0. Expose `discussion.likesCount()` on the Discussion model ──────────
+  // The Schema field is registered in extend.php (DiscussionResource),
+  // but the API attribute doesn't automatically materialize as a JS
+  // accessor on the model. flarum/likes does the same dance for Post:
+  //   new Extend.Model(Post).attribute('likesCount')
+  // We do the imperative equivalent here so GNDiscussionCard can read
+  // `discussion.likesCount()` instead of `discussion.attribute('likesCount')`,
+  // matching the existing `commentCount()`/`title()`/etc. style.
+  Discussion.prototype.likesCount = Model.attribute('likesCount');
+
+  // ── 0.5. Mobile nav: rely on Flarum's native @phone pattern ──────────────
+  // On phone widths, Flarum auto-positions three pieces inside the
+  // 56px `#app-navigation` strip:
+  //   • `.App-backControl`     ← left — drawer toggle (search, auth, theme)
+  //   • `.App-titleControl`    ← center — IndexSidebar's SelectDropdown,
+  //                              i.e. THE NAV MENU (All Discussions, tags,
+  //                              custom pages). Same surface Mosaic uses.
+  //   • `.App-primaryControl`  ← right — search / notifications / user menu
+  //
+  // We don't override any of that in JS — we just keep `IndexSidebar`
+  // mounted (the sidebar override below) so its `titleControl()` method
+  // returns the SelectDropdown that Flarum then teleports into
+  // `.App-titleControl`. Theming lives entirely in less/forum.less under
+  // the `@media (max-width: 767.98px)` block.
+
+  // ── 1. Force the WelcomeHero to always render ─────────────────────────────
+  // Honor the operator's empty-title escape hatch (blank welcomeTitle =
+  // hide the hero) but ignore the per-visitor localStorage dismiss flag
+  // so visitors can't make our themed hero disappear.
+  override(WelcomeHero.prototype, 'isHidden', function () {
+    const title = app.forum.attribute('welcomeTitle');
+    return !title || !String(title).trim();
+  });
+
+  // ── 2. Strip the dismiss-button + add composer trigger + hero stats ───────
+  // contentItems() lives inside .containerNarrow nested in the hero
+  // gradient. Reading order top-to-bottom:
+  //   title (100) → subtitle (default ~10) → composer (8) → stats (5)
+  //
+  // The composer card sits ABOVE the stats. Title/subtitle reads as
+  // the welcome message; the next thing the visitor sees is the
+  // "what's on your mind" prompt — the primary affordance — with the
+  // supporting stat counts below as ambient context. Subtitle's
+  // default priority is ~10, so composer at 8 + stats at 5 keep both
+  // below the welcome text without inverting them.
+  //
+  // The pill nav row (GNHeroNav) deliberately renders OUTSIDE the hero —
+  // see the override(hero) below — so it reads on the page bg instead
+  // of the gradient.
+  extend(WelcomeHero.prototype, 'bodyItems', function (items) {
+    items.remove('dismiss-button');
+  });
+
+  extend(WelcomeHero.prototype, 'contentItems', function (items) {
+    items.add('gn-composer',    m(GNComposerTrigger), 8);
+    items.add('gn-hero-extras', m(GridIronHero), 5);
+  });
+
+  // ── 3. Hero slot = [WelcomeHero, GNHeroNav] as siblings ───────────────────
+  // IndexPage.hero() returns a single component by default. Override to
+  // return a fragment so the pill nav row renders right below the
+  // gradient hero, on the page background — easier to read than nav
+  // sitting on the crimson and not constrained by the hero copy.
+  override(IndexPage.prototype, 'hero', function () {
+    return [
+      m(WelcomeHero),
+      m(GNHeroNav),
+    ];
+  });
+
+  // ── 4. DiscussionHero — decorative FontAwesome tag icons ──────────────────
+  // Anchors up to two big semi-transparent tag icons to the right side
+  // of every tagged discussion's hero, mirroring ramon/avocado's
+  // `.DiscussionHero-decorationIcon` + `has-two-deco-icons` pattern.
+  //
+  // Uses the `view` extender (same pattern flarum/tags uses to add tag
+  // pills to the hero — see vendor/flarum/tags/js/src/forum/addTagLabels.js).
+  // We mutate the returned vdom in place, pushing our decoration vnode
+  // as a direct child of the .Hero <header>. That's more reliable than
+  // adding to bodyItems because it doesn't depend on the bodyItems
+  // ItemList being unwrapped inside `.container`, and it survives
+  // alongside other extensions that override DiscussionHero.view().
+  //
+  // Rules:
+  //   - SECONDARY tags only. A tag qualifies when `tag.parent()`
+  //     returns truthy (i.e. it's nested under a primary tag) AND it
+  //     has an icon class set in the flarum/tags admin. Falls back to
+  //     ANY tag with an icon if no secondary candidates exist — that
+  //     way flat tag setups still get decoration.
+  //   - Up to 2 icons rendered, controlled by `hero_deco_icon_count`
+  //     (1 or 2). The 2-icon layout requires ≥ 768px viewport — on
+  //     tablet/phone we fall back to 1 icon.
+  //   - Opacity is `hero_deco_opacity` (0–100, default 12), applied
+  //     via the `--gn-deco-opacity` CSS custom property. Setting 0
+  //     hides the decoration.
+  //   - Gated by `hero_deco_enabled`.
+  // Use the canonical items() ItemList extender — the SAME hook
+  // flarum/tags uses to add tag pills to the hero. Items are wrapped
+  // in <li> via listItems(), which we then absolute-position via CSS
+  // (.GN-discussionHero-deco-li). This is more reliable than
+  // mutating the returned vdom in place — Mithril's diff sees the
+  // ItemList output the moment the hero re-renders.
+  extend(DiscussionHero.prototype, 'items', function (items) {
+    const deco = gnPickDecoTags(this.attrs.discussion);
+    if (!deco) return;
+
+    // Negative priority pushes it after every other item — it's
+    // decoration, not content.
+    items.add('gn-hero-deco-icons', gnDecoVnode(deco.picked, deco.opacity), -100);
+  });
+
+  // ── 5. Discussion list rows → GNDiscussionCard showcase layout ───────────
+  // Override DiscussionListItem.view() to render our showcase card inside
+  // the standard `<div class="DiscussionListItem">` wrapper. The wrapper is
+  // load-bearing — Slidable hooks, `.active` routing class, and especially
+  // ramon/colored's `--item-tag-color` inline style all live on it.
+  //
+  // Earlier we tried calling `original()` inside the override to let
+  // ramon/colored's `extend` extender mutate a throwaway vnode whose
+  // attrs.style we then stole. Cleaner in theory but it broke initial
+  // page-load rendering: invoking original() creates Mithril component
+  // vnodes (DiscussionControls, etc.) that the diff cycle thinks were
+  // mounted, so the next scheduled redraw (the one that should swap the
+  // empty-state Placeholder for the populated item list) never updated
+  // the DOM. Result: the user saw "There are no discussions" on every
+  // initial homepage load until a manual `m.redraw.sync()`.
+  //
+  // The pragmatic fix: skip original() entirely and reproduce
+  // ramon/colored's `--item-tag-color` injection inline — it's a
+  // one-liner ("take the first tag's color"). We give up ramon/colored's
+  // onclick wrapper that pre-animates the body primary color before
+  // navigation; the discussion-page hero sets the same color on mount
+  // anyway, so the user just sees the swap a frame later. Net visual
+  // impact: negligible. Reliability impact: the homepage actually
+  // renders on first load.
+  override(DiscussionListItem.prototype, 'view', function () {
+    const discussion = this.attrs.discussion;
+
+    // Mirror ramon/colored's `--item-tag-color` injection so the
+    // showcase card accent strip can pick up the tag color via the
+    // CSS rule
+    //   `html[data-colored-border='left'] .GN-showcaseCard-accent
+    //      { background: var(--item-tag-color, …); }`
+    // without us depending on ramon/colored's extender ever running.
+    // Reads the first tag's color (matching ramon/colored's pattern —
+    // it sortTags()es first but the visible primary is usually first).
+    let tagColor = null;
+    try {
+      const tags = (discussion && discussion.tags && discussion.tags()) || [];
+      const first = tags[0];
+      if (first && typeof first.color === 'function') tagColor = first.color() || null;
+    } catch (e) { /* tag accessor failed — render plain card */ }
+
+    return m(
+      'div',
+      {
+        className: classList(
+          'DiscussionListItem',
+          this.attrs.className,
+          {
+            active: typeof this.active === 'function' ? this.active() : false,
+            'DiscussionListItem--hidden': discussion && discussion.isHidden && discussion.isHidden(),
+            Slidable: typeof this.isSlidableEnabled === 'function' ? this.isSlidableEnabled() : false,
+          }
+        ),
+        style: tagColor ? { '--item-tag-color': tagColor } : null,
+      },
+      m(GNDiscussionCard, {
+        discussion:      discussion,
+        params:          this.attrs.params,
+        jumpTo:          this.attrs.jumpTo,
+        author:          this.attrs.author,
+        highlightRegExp: this.highlightRegExp,
+      })
+    );
+  });
+
+  // ── 6. Sidebar: keep IndexSidebar (hidden), append widget stack ───────────
+  // CSS flips the .Page-container flex direction so the sidebar lands on
+  // the right of the discussion list. IndexSidebar stays mounted so its
+  // navItems() can feed our hero pill row + GNComposerTrigger's click
+  // delegate (.IndexPage-newDiscussion) is still in the DOM.
+  //
+  // Each widget honors an admin setting — when toggled off via the
+  // extension page, the widget's `shouldRender()` returns false and
+  // Mithril doesn't render it. We still mount the components and let
+  // them self-gate so the toggle is a runtime concern, not a wiring
+  // concern.
+  override(IndexPage.prototype, 'sidebar', function (original) {
+    const showLive     = app.forum.attribute('gridiron-nation.widget_live_scores')  !== false;
+    const showTrending = app.forum.attribute('gridiron-nation.widget_trending')     !== false;
+    const showRecruits = app.forum.attribute('gridiron-nation.widget_top_recruits') !== false;
+
+    return [
+      original(),
+      m('.GN-widgetSidebar', [
+        showLive     ? m(LiveScoresWidget)  : null,
+        showTrending ? m(TrendingWidget)    : null,
+        showRecruits ? m(TopRecruitsWidget) : null,
+      ]),
+    ];
+  });
+});
