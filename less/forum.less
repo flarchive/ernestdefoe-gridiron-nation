@@ -1,0 +1,3292 @@
+// ============================================================
+// GridIron Nation — Forum Theme
+// Flarum 2 · Avocado-inspired · College Football
+//
+// Design tokens
+//   Primary:     #B22222 (Crimson)
+//   Font:        DM Sans Variable (Google Fonts)
+//   Radius:      14px (organic, Avocado-style)
+//   Dark mode:   @media block MUST stay at very end of file
+// ============================================================
+
+// ── Google Fonts ─────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..900;1,9..40,300..900&display=swap');
+
+// ── LESS constants (geometry, palette, shadows) ───────────────────────────────
+@gn-primary:      #B22222;
+@gn-primary-dark: #8B0000;
+@gn-primary-light:#d94f4f;
+
+@gn-bg:           #f0f1f5;
+@gn-surface:      #f8f8fa;
+@gn-card:         #ffffff;
+@gn-border:       rgba(0, 0, 0, 0.07);
+@gn-text:         #22232a;
+@gn-muted:        #9fa0ab;
+@gn-secondary:    #5f6070;
+@gn-online:       #4ec46a;
+
+@gn-radius:       14px;
+@gn-radius-sm:    9px;
+@gn-radius-md:    12px;
+@gn-radius-lg:    18px;
+@gn-transition:   0.15s ease;
+@gn-ease:         ease;
+
+@gn-shadow-sm:    0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+@gn-shadow-md:    0 4px 16px rgba(0, 0, 0, 0.09), 0 2px 6px rgba(0, 0, 0, 0.05);
+@gn-shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.12), 0 3px 10px rgba(0, 0, 0, 0.06);
+
+// ── Avocado-flavored organic geometry ───────────────────────────────────────
+// Ported from ramon/avocado's mixin pack. The signature look of the
+// avocado theme is asymmetric border-radius that rotates between three
+// different "blob" shapes via nth-child — discussion list rows and
+// avatars get organic edges rather than identical rectangles. Combined
+// with a soft 2-layer drop shadow, that's what visually separates an
+// avocado-style theme from stock Flarum.
+@gn-blob-a: ~"43% 57% 68% 32% / 33% 50% 50% 67%";
+@gn-blob-b: ~"42% 58% 33% 67% / 57% 49% 51% 43%";
+@gn-blob-c: ~"58% 42% 68% 32% / 48% 73% 27% 52%";
+@gn-soft-shadow: rgba(0, 0, 0, 0.25) 0 2px 5px -1px, rgba(0, 0, 0, 0.3) 0 1px 3px -1px;
+
+// Stamp the three blob radii across nth-child rotations on @elem.
+.gn-organic-radius(@elem) {
+  &:nth-child(2n)   { @{elem} { border-radius: @gn-blob-a; } }
+  &:nth-child(2n+1) { @{elem} { border-radius: @gn-blob-b; } }
+  &:nth-child(3n)   { @{elem} { border-radius: @gn-blob-c; } }
+}
+
+// ── CSS variable overrides (Flarum 2 theming layer) ───────────────────────────
+:root {
+  --primary-color:       @gn-primary;
+  --primary-color-dark:  @gn-primary-dark;
+  --primary-color-light: @gn-primary-light;
+
+  --body-bg:      @gn-bg;
+  --control-bg:   @gn-surface;
+  --border-color: @gn-border;
+
+  --body-color:   @gn-text;
+  --muted-color:  @gn-muted;
+  --heading-color:@gn-text;
+  --link-color:   @gn-primary;
+  --link-hover-color: @gn-primary-dark;
+
+  // Text aliases used by social-groups and other extensions
+  --text-color:      var(--body-color);
+  --text-secondary:  @gn-secondary;
+
+  // Border radius — applied globally
+  --border-radius:    @gn-radius;
+  --border-radius-sm: @gn-radius-sm;
+}
+
+// ── Global base ───────────────────────────────────────────────────────────────
+body,
+.App {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background: var(--body-bg);
+  color: var(--body-color);
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+.Button--primary {
+  background: @gn-primary;
+  color: #fff;
+  border-radius: @gn-radius-sm;
+  font-weight: 600;
+  transition: background @gn-transition, box-shadow @gn-transition;
+
+  &:hover,
+  &:focus {
+    background: @gn-primary-dark;
+    color: #fff;
+    box-shadow: @gn-shadow-sm;
+  }
+}
+
+.Button {
+  border-radius: @gn-radius-sm;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.App-header {
+  background: #fff;
+  border-bottom: 1px solid @gn-border;
+  box-shadow: @gn-shadow-sm;
+  height: 58px;
+
+  .Header-logo,
+  .Header-title {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    color: @gn-primary;
+  }
+}
+
+.HeaderNav .item > a,
+.HeaderNav .item > button {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: @gn-radius-sm;
+  transition: background @gn-transition, color @gn-transition;
+
+  &:hover {
+    background: rgba(@gn-primary, 0.07);
+    color: @gn-primary;
+  }
+
+  &.active,
+  &.active:hover {
+    color: @gn-primary;
+    border-bottom: 2px solid @gn-primary;
+  }
+}
+
+// ── GN Header Navigation (injected via HeaderPrimary.items()) ─────────────────
+.GN-headerNav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 8px;
+
+  // Phone: hide the inline header nav — Flarum's mobile drawer
+  // (triggered by `.Navigation-drawer` in App-backControl) is the
+  // primary navigation surface on phones. Leaving the inline links
+  // visible competes with the hamburger for tap targets and crowds
+  // the 58px-tall header bar.
+  @media (max-width: 767.98px) {
+    display: none;
+  }
+}
+
+// ── Mobile hamburger nav (Flarum core) ───────────────────────────────────────
+//
+// Flarum 2 renders `<button class="Navigation-drawer">` inside
+// `#app-navigation.App-navigation > .App-backControl` (NOT inside
+// `.App-header` — that was a wrong assumption that cost us a build).
+// Flarum positions the drawer trigger absolutely in the top-left at
+// (0, 0), 40px wide × 46px tall, and toggles `<html class="drawerOpen">`
+// to slide the navigation drawer in.
+//
+// We don't own this markup — we just guarantee:
+//   1. The icon is recognizably crimson so users see "this is the
+//      themed forum's menu button" rather than a stock greyed control
+//      that blends into the page bg.
+//   2. The hit target keeps Flarum's 40×46 size so iOS tap targets
+//      stay above the 44px Apple guideline.
+//   3. Tinted hover/active feedback matches the rest of the theme.
+// On mobile, Flarum core slides the entire `.App-header` (logo, search,
+// nav, secondary controls) INTO `.App-drawer`, then `transform`s the
+// drawer offscreen to the left. The only visible chrome at the top of
+// the page is `#app-navigation` — a 46px tall, fixed-position strip
+// with three absolutely-positioned slots:
+//
+//   • `.App-backControl`     (left)   — hamburger that toggles the drawer
+//                                       (Search / Notifications / Theme / Auth)
+//   • `.App-titleControl`    (center) — IndexSidebar's escaped SelectDropdown
+//                                       === THE REAL NAV MENU. Shows the current
+//                                       view ("All Discussions" / tag name / etc.)
+//                                       and tap-opens a bottom-sheet of every
+//                                       nav destination (tags, custom pages, all
+//                                       the items that live in the desktop sidebar).
+//                                       Same pattern Mosaic/Avocado rely on.
+//   • `.App-primaryControl`  (right)  — Search + Notifications + User menu
+//
+// We theme the strip (white surface in light, dark in dark, themed
+// border + shadow), color the burger crimson, and tune the center
+// title-control so it reads on our header instead of the muted core
+// grey. We deliberately do NOT inject our own static title — that
+// would occlude the title-control dropdown and remove the nav menu.
+@media (max-width: 767.98px) {
+  #app-navigation.App-navigation {
+    background: var(--header-bg, #fff);
+    border-bottom: 1px solid var(--border-color, @gn-border);
+    box-shadow: @gn-shadow-sm;
+    // Core sets `--header-height-phone` (default 56px); make sure our
+    // padded content area below clears it.
+  }
+
+  // --- Burger (left) — opens the slide-in drawer with search, notifications,
+  // theme toggle, login/signup. NOT the nav menu — that's the title control.
+  #app-navigation .Navigation-drawer,
+  #app-navigation .Navigation-drawer .Button-icon,
+  #app-navigation .Navigation-drawer i {
+    color: var(--primary-color, @gn-primary) !important;
+  }
+  #app-navigation .Navigation-drawer {
+    background: transparent;
+    border-radius: @gn-radius-sm;
+    transition: background @gn-transition, color @gn-transition;
+
+    &:hover, &:focus, &:active,
+    &:hover .Button-icon, &:focus .Button-icon, &:active .Button-icon {
+      background: rgba(@gn-primary, 0.10);
+      color: @gn-primary !important;
+    }
+
+    i { font-size: 1.25rem; }
+  }
+
+  // --- Title control (center) — THE NAV MENU. Flarum's core CSS sizes it
+  // at 200px wide and positions it at left: 50% / margin-left: -100px.
+  // We widen it on phone-portrait so longer page titles ("All Discussions",
+  // "General Discussion", custom-tag names with team mascots) don't truncate,
+  // and we re-color the chevron + label crimson so it reads as "this is
+  // the themed nav menu, tap to switch view".
+  .App-titleControl {
+    // Wider so longer conference names ("Southeastern Conference",
+    // "Atlantic Coast Conference") don't truncate. Fixed px (not a CSS
+    // min()/vw) on purpose: less.php evaluates min() with its own function
+    // and errors on mixed px/vw units, which breaks the whole forum build.
+    // 320px stays within the narrowest phones; margin-left is half the
+    // width so it stays centered under the header.
+    width: 320px !important;
+    margin-left: -160px !important;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+
+    > .Button,
+    .Dropdown-toggle {
+      color: var(--primary-color, @gn-primary) !important;
+      font-weight: 700;
+      font-size: 1rem !important;
+    }
+    .Button-icon,
+    .Button-caret,
+    i.icon {
+      color: var(--primary-color, @gn-primary) !important;
+    }
+  }
+
+  // --- Primary control (right) — Search / Notifications / User menu.
+  // Tint the buttons crimson too so the whole strip reads as one
+  // themed bar rather than three differently-styled icon zones.
+  .App-primaryControl {
+    > .Button,
+    .Dropdown-toggle,
+    > .Button .Button-icon,
+    > .Button i {
+      color: var(--primary-color, @gn-primary) !important;
+    }
+    > .Button:hover,
+    > .Button:focus {
+      background: rgba(@gn-primary, 0.10) !important;
+    }
+  }
+}
+
+// Hero navigation — pill row BELOW the WelcomeHero gradient, rendered
+// as a sibling of the hero inside .Page-hero. Reads on the page
+// background, not on the gradient, so contrast tuning targets
+// --body-bg + --body-color rather than the hero's white-on-crimson.
+//
+// Items come from IndexSidebar.navItems via GNHeroNav.js, so any
+// installed extension (tags, subscriptions, social-groups, etc.)
+// populates the row automatically.
+.GN-heroNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px auto 0;
+  padding: 0 16px;
+  max-width: 1100px;
+
+  // Phone: handled by Flarum's own .App-titleControl SelectDropdown;
+  // duplicating the pills here would just crowd the page on mobile.
+  @media (max-width: 767.98px) {
+    display: none;
+  }
+
+  > * { list-style: none; }
+
+  a, .Button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--body-color, @gn-text);
+    background: var(--control-bg, #fff);
+    border: 1px solid var(--border-color, @gn-border);
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background @gn-transition, border-color @gn-transition, color @gn-transition, transform @gn-transition;
+    white-space: nowrap;
+
+    // Let the wide conference glyphs size their own box and lean on the
+    // flex `gap` above instead of overlapping the pill label.
+    .Button-icon, i, .icon, .TagIcon {
+      width: auto !important;
+      min-width: 1.1em;
+      margin: 0 !important;
+      flex: 0 0 auto;
+      text-align: center;
+    }
+
+    &:hover, &:focus {
+      background: rgba(@gn-primary, 0.08);
+      border-color: rgba(@gn-primary, 0.35);
+      color: @gn-primary;
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    &.active, &.active:hover {
+      background: @gn-primary;
+      border-color: @gn-primary;
+      color: #fff;
+    }
+  }
+}
+
+// 🚨 Bespoke draws its own nav row on the index (.BespokeHeaderNav — pills or
+// tiles, the forum's choice), built from the same navItems as this one. With
+// both themes enabled the index showed two navs stacked, every link twice.
+// Bespoke's is the one the forum configured, so this row steps aside — and
+// only when Bespoke's is actually on the page, so GridIron alone keeps it.
+body:has(.BespokeHeaderNav) .GN-heroNav {
+  display: none;
+}
+
+// "Tell everyone what you're working on…" composer trigger.
+// Rendered inside .Hero.WelcomeHero (last hero contentItem), mirrors
+// MosaicComposerTrigger's pill shape exactly:
+//   - 999px border-radius on the outer card AND inner CTA button
+//   - White (98% alpha) so the crimson hero gradient reads through softly
+//   - Big drop shadow so the card lifts off the gradient
+//   - ~58px min height with 6px 6px 6px 22px asymmetric padding so the
+//     CTA button sits flush against the right edge
+.GN-composerTrigger {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  margin: 0;
+  padding: 6px 6px 6px 22px;
+  min-height: 58px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+
+  &:hover, &:focus-within {
+    background: #fff;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid @gn-primary;
+    outline-offset: 2px;
+  }
+
+  &-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &-avatar, &-logo {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  &-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, @gn-primary 0%, @gn-primary-dark 100%);
+    color: #fff;
+    font-size: 0.95rem;
+  }
+
+  &-placeholder {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--muted-color, @gn-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-newBtn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 42px;
+    padding: 0 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: @gn-primary;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background @gn-transition;
+
+    &:hover { background: @gn-primary-dark; color: #fff; }
+
+    .fas { font-size: 0.78rem; }
+
+    @media (max-width: 480px) {
+      padding: 0 14px;
+      &-label { display: none; }
+    }
+  }
+}
+
+// ── Hero — Flarum 2 renders WelcomeHero as .Hero.WelcomeHero ─────────────────
+//
+// Background: defaults to our crimson gradient, BUT defers to
+// `--hero-bg` if ramon/colored (or any other extension) sets it. That
+// extension paints `--hero-bg` per-tag on tagged-discussion pages,
+// turning the hero into the tag's color; our default block kicks in
+// everywhere else (forum index, untagged discussions).
+//
+// On top of whatever fills the hero we layer two decorative passes:
+//   ::before — football-shape SVG pattern (semi-transparent white) so
+//              the hero reads as football-themed no matter what color
+//              base is underneath. White at 7% opacity keeps the
+//              pattern readable on crimson, dark slate, AND any tag
+//              tint ramon/colored throws at us.
+//   ::after  — diagonal yard-line bands at the bottom — subtle motion
+//              + depth without competing with content.
+//
+// Also: the hero is non-dismissable. The override() of
+// WelcomeHero.prototype.isHidden in forum.js keeps the hero visible,
+// the WelcomeHero "dismiss-button" is removed from items in the same
+// initializer, and we have no `&.is-hidden` rule here so even if
+// upstream Flarum re-enables the dismiss path our CSS won't hide it.
+// WelcomeHero — the index-page hero, ALWAYS our crimson gradient. We
+// deliberately don't read `--hero-bg` here because some installs (or
+// ramon/colored when not on a tagged-discussion page) set that var to
+// a near-white value, which made the welcome hero look invisible on
+// the light theme variant. The discussion-level hero block below
+// keeps the var() for per-tag tinting.
+.Hero.WelcomeHero {
+  background: linear-gradient(135deg, @gn-primary 0%, @gn-primary-dark 100%);
+  color: #fff;
+  padding: 2.5rem 0 1.5rem;
+  border-radius: 0;
+  position: relative;
+  // overflow stays VISIBLE so the Online popover (.GN-onlinePopover), which is
+  // absolutely positioned and opens downward past the hero's bottom edge, isn't
+  // clipped when more than ~2 members are online. The decorative ::before
+  // (inset:0) and ::after (bottom 6px band) sit within the box and don't spill,
+  // so dropping the clip has no visual cost here.
+  overflow: visible;
+
+  // ── Football pattern overlay ─────────────────────────────────────────
+  // Three stylized footballs (oval + laces) tile across the hero at
+  // different rotations + sizes. SVG is inline as a URL-encoded data:
+  // URI so no asset-pipeline plumbing is required. White stroke at 7%
+  // opacity keeps the pattern legible over both our default crimson
+  // gradient and any tag-color tint ramon/colored applies.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='120' viewBox='0 0 240 120'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='0.07' stroke-width='1.4' stroke-linecap='round'%3E%3Cg transform='translate(40 30) rotate(-25)'%3E%3Cellipse rx='18' ry='9'/%3E%3Cline x1='-8' y1='0' x2='8' y2='0'/%3E%3Cline x1='-4' y1='-2.5' x2='-4' y2='2.5'/%3E%3Cline x1='-1' y1='-2.5' x2='-1' y2='2.5'/%3E%3Cline x1='2' y1='-2.5' x2='2' y2='2.5'/%3E%3Cline x1='5' y1='-2.5' x2='5' y2='2.5'/%3E%3C/g%3E%3Cg transform='translate(170 60) rotate(15)'%3E%3Cellipse rx='22' ry='11'/%3E%3Cline x1='-10' y1='0' x2='10' y2='0'/%3E%3Cline x1='-6' y1='-3' x2='-6' y2='3'/%3E%3Cline x1='-3' y1='-3' x2='-3' y2='3'/%3E%3Cline x1='0' y1='-3' x2='0' y2='3'/%3E%3Cline x1='3' y1='-3' x2='3' y2='3'/%3E%3Cline x1='6' y1='-3' x2='6' y2='3'/%3E%3C/g%3E%3Cg transform='translate(80 95) rotate(40)'%3E%3Cellipse rx='14' ry='7'/%3E%3Cline x1='-6' y1='0' x2='6' y2='0'/%3E%3Cline x1='-3' y1='-2' x2='-3' y2='2'/%3E%3Cline x1='0' y1='-2' x2='0' y2='2'/%3E%3Cline x1='3' y1='-2' x2='3' y2='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 240px 120px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // ── Yard-line band ───────────────────────────────────────────────────
+  // A thin striped band along the bottom edge — evokes a goal-line
+  // chalk pattern without dominating the hero. Drawn with repeating-
+  // linear-gradient so no second SVG is needed.
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 6px;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.18) 0 2px,
+      transparent 2px 14px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // Children must clear the decorative layers' z-index so the title +
+  // hero content remain on top of the SVG pattern + yard-line band.
+  > .container,
+  .containerNarrow {
+    position: relative;
+    z-index: 1;
+  }
+
+  // Stack title → subtitle → stats → pill nav vertically inside
+  // .containerNarrow. Flarum 2's Hero base wraps bodyItems in
+  // .container then ContentItems in .containerNarrow, so this is
+  // where our injected contentItems (gn-hero-extras, gn-hero-nav)
+  // actually land.
+  .containerNarrow {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+
+    > .Hero-title { margin: 0; }
+    > .Hero-subtitle { margin: 0; }
+  }
+
+  // Two-column layout: title/subtitle LEFT, stats/chips RIGHT.
+  // WelcomeHero wraps bodyItems in .container — we make that a flex row.
+  > .container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding-bottom: 1.5rem;
+  }
+
+  // Flarum's actual hero title class
+  .Hero-title,
+  h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 0.35rem;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  // Flarum's actual hero subtitle class
+  .Hero-subtitle,
+  p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 0;
+  }
+}
+
+// ── Hero extras injected by GridIronHero.js ───────────────────────────────────
+// Sits on the RIGHT side of the hero (flex sibling to .containerNarrow).
+.GN-hero-extras {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+// ── Stadium scoreboard — single Jumbotron panel, not cards ──────────────────
+// The whole stats row reads as ONE dark scoreboard panel set into the
+// hero, with four slots split by thin vertical glow dividers. Each
+// slot stacks: FA icon (small, top) → big condensed-digit value
+// (center) → uppercase tracking label (below). Looks like the
+// out-of-town score panel on a stadium scoreboard, not four floating
+// chips.
+.GN-scoreboard {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 0;
+  // Headroom so the NEWEST slot can grow to fit a longer display name
+  // (see .GN-newestWrap flex + the name max-width below) instead of
+  // truncating it. The panel is content-sized and stays centred in the
+  // hero, so it only widens toward this cap when a name actually needs it.
+  max-width: 720px;
+  padding: 16px 8px;
+  background:
+    linear-gradient(180deg, rgba(8, 10, 18, 0.92) 0%, rgba(4, 6, 12, 0.96) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+  color: #fff;
+
+  // Stadium pinstripe — subtle horizontal lines across the panel
+  // bg, like the field-line pattern under a Jumbotron readout.
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 5px,
+      rgba(255, 255, 255, 0.025) 5px,
+      rgba(255, 255, 255, 0.025) 6px
+    ),
+    linear-gradient(180deg, rgba(8, 10, 18, 0.92) 0%, rgba(4, 6, 12, 0.96) 100%);
+
+  @media (max-width: 480px) {
+    padding: 10px 4px;
+    gap: 0;
+  }
+}
+
+// ── Blinking-colon separator ─────────────────────────────────────────────
+// Lives between the forum stats (MEMBERS/TOPICS/POSTS) and the social
+// stats (NEWEST/ONLINE) — sized to match the slot values' visual weight,
+// painted in primary crimson so it reads as the scoreboard's
+// quarter/period colon. The hard-step animation (no easing, snaps
+// between visible and invisible) is what makes it feel like a real
+// scoreboard rather than a soft fade.
+.GN-scoreboard-sep {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 0 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--primary-color, @gn-primary);
+  text-shadow:
+    0 0 6px rgba(@gn-primary, 0.45),
+    0 0 14px rgba(@gn-primary, 0.20);
+  user-select: none;
+  pointer-events: none;
+  animation: gn-scoreboard-blink 1.2s steps(2, jump-none) infinite;
+
+  // Suppress the slot-divider rule for any slot that immediately
+  // follows the separator — we don't want a glowing vertical line
+  // beside the colon, the colon IS the divider.
+  + .GN-scoreSlot::before {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.25rem;
+    padding: 0 4px;
+  }
+}
+
+@keyframes gn-scoreboard-blink {
+  // Hard step: visible for the first half of the cycle, invisible
+  // for the second. Combined with `steps(2, jump-none)` above this
+  // produces a clean on/off snap with no easing — the real-scoreboard
+  // tempo.
+  0%, 49.99%   { opacity: 1; }
+  50%, 100%    { opacity: 0; }
+}
+
+.GN-scoreSlot {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 14px;
+  text-align: center;
+
+  // Thin glowing divider between slots — only on slots after the
+  // first, so the leftmost slot has no leading line.
+  + .GN-scoreSlot::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12%;
+    bottom: 12%;
+    width: 1px;
+    background: linear-gradient(180deg,
+      transparent 0,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 100%
+    );
+  }
+
+  &-icon {
+    font-size: 0.85rem;
+    color: rgba(255, 200, 200, 0.7);     // soft crimson tint — team-color hint
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  &-value {
+    font-family: 'DM Sans', 'SF Mono', Menlo, monospace;
+    font-weight: 800;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 12px rgba(255, 200, 200, 0.35);   // subtle scoreboard glow
+  }
+
+  &-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  // The pulsing green dot for the ONLINE slot — replaces the FA icon.
+  &-pulse {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.7);
+    animation: gn-pulse 1.4s ease-in-out infinite;
+    margin-bottom: 2px;
+  }
+
+  // NEWEST member slot — small avatar in place of the FA icon.
+  &-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
+    margin-bottom: 4px;
+
+    &--initial {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, @gn-primary 0%, @gn-primary-dark 100%);
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 700;
+    }
+  }
+
+  // The "value" line for the NEWEST slot is a display name, not a
+  // number — drop the monospace + tabular-nums + glow that the other
+  // slots use, and shrink it so a long handle still fits.
+  &-value--name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-shadow: none;
+    letter-spacing: 0;
+    // Responsive cap: roomy on desktop so most real display names fit
+    // without truncating, narrowing on small screens so the scoreboard row
+    // doesn't overflow. Ellipsis still catches the rare extreme-length name.
+    max-width: clamp(120px, 18vw, 200px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-chev {
+    font-size: 0.55rem;
+    transition: transform 0.18s @gn-ease;
+    opacity: 0.8;
+  }
+
+  // Button wrapper for the interactive ONLINE slot.
+  &-trigger {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+
+    &:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.6);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .GN-scoreSlot {
+    padding: 0 8px;
+    &-value { font-size: 1.3rem; }
+    &-label { font-size: 0.55rem; letter-spacing: 0.12em; }
+  }
+  // Equal slot share on phones — the desktop name-slot growth would crowd
+  // the numeric slots in the narrow row.
+  .GN-newestWrap { flex: 1 1 0; }
+}
+
+// ── Interactive Online slot wrap ────────────────────────────────────────────
+// The popover positioning anchors against the slot directly, since
+// the slot is already position:relative for its leading divider.
+.GN-onlineWrap {
+  cursor: pointer;
+  transition: background 0.15s @gn-ease;
+
+  &:hover, &.is-open {
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+// Newest member slot is a link — strip default underline + inherit
+// color from the scoreboard so the slot doesn't read as a stray
+// hyperlink.
+.GN-newestWrap {
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s @gn-ease;
+  // Names need more room than the 2–3 digit numeric slots, so let this slot
+  // grow wider than its siblings. Reset to an equal share on small screens
+  // (see the 480px media query) so the mobile row stays balanced.
+  flex: 1.6 1 0;
+
+  &:hover, &:focus {
+    background: rgba(255, 255, 255, 0.04);
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.GN-hero-statChev {
+  font-size: 0.6rem;
+  margin-left: 4px;
+  opacity: 0.75;
+  transition: transform 0.18s @gn-ease;
+}
+
+.GN-onlinePopover {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 240px;
+  max-width: 320px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--control-bg, #fff);
+  color: var(--body-color, @gn-text);
+  border: 1px solid var(--border-color, @gn-border);
+  border-radius: @gn-radius-md;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 4px 8px rgba(0, 0, 0, 0.10);
+  padding: 6px;
+  // High enough to sit above the pill nav row + page content the popover now
+  // overlaps once it extends past the (no-longer-clipping) hero bottom edge.
+  z-index: 200;
+  text-align: left;
+
+  // Arrow pointing back up at the slot, centered now that the
+  // popover anchors to the slot's center.
+  &::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    margin-left: -6px;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    border-left: 1px solid var(--border-color, @gn-border);
+    border-top: 1px solid var(--border-color, @gn-border);
+    transform: rotate(45deg);
+  }
+
+  &-empty {
+    padding: 14px 16px;
+    color: var(--muted-color, @gn-muted);
+    font-size: 0.88rem;
+    text-align: center;
+  }
+}
+
+.GN-onlineList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li { margin: 0; }
+}
+
+.GN-onlineRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: @gn-radius-sm;
+  color: var(--body-color, @gn-text);
+  text-decoration: none;
+  transition: background @gn-transition;
+
+  &:hover, &:focus {
+    background: rgba(@gn-primary, 0.08);
+    text-decoration: none;
+    color: var(--body-color, @gn-text);
+  }
+}
+
+.GN-onlineAvatar {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  font-size: 0.8rem;
+}
+
+.GN-onlineName {
+  flex: 1 1 auto;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.GN-onlineDot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 2px var(--control-bg, #fff);
+}
+
+.GN-hero-statNum {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.GN-hero-statLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.GN-hero-statDivider {
+  width: 1px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 0 0 0 1.25rem;   // gap on the LEFT of the divider
+}
+
+// Hero tag chips removed — tag navigation lives in the pill row below
+// the hero now (see .GN-heroNav). The old `.GN-hero-chip` rules used
+// to render small white chips inside GridIronHero on the crimson
+// gradient; those styles are gone with the chips themselves.
+
+// ── Tags / Filters bar ────────────────────────────────────────────────────────
+.TagLabel {
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  // Roomier pills so the wide conference glyphs (see below) have space
+  // to breathe instead of crowding the label text.
+  padding: 5px 14px;
+  // !important throughout this rule: flarum/tags ships its own .TagLabel /
+  // .TagIcon CSS that loads AFTER this theme's forum.less, so without it
+  // our flex layout is reset and the wide custom conference glyphs (ACC /
+  // B1G / IU …) render flush on top of the label text. flarum/tags renders
+  // the icon as <i class="TagIcon …">, so that is the element to space.
+  display: inline-flex !important;
+  align-items: center;
+  gap: 9px !important;
+
+  i, .icon, .TagIcon {
+    font-size: 1rem;
+    line-height: 1;
+    width: auto !important;
+    min-width: 1.1em;
+    margin: 0 !important;
+    flex: 0 0 auto;
+    text-align: center;
+  }
+}
+
+.TagsLabel,
+.DiscussionListItem-tags .TagLabel {
+  border-radius: 999px;
+}
+
+// ── Tags page grid — keep wide conference glyphs off the tile title ─────────
+// flarum/tags renders each tile with an <i class="TagTile-icon"> before the
+// tag name. The custom conference icons (ACC/B1G/Pac12/SBC) are far wider than
+// a square FA glyph, so the wordmark bleeds into the heading. !important is
+// required because flarum/tags' own .TagTile-icon CSS loads after this theme
+// and otherwise wins (same load-order issue as the tag pills). Spacing only —
+// we deliberately do NOT touch float/display, so the tile layout is untouched
+// and the wide glyph just gets a generous gap before the title.
+.TagTile .TagTile-icon,
+.TagTile .TagIcon {
+  width: auto !important;
+  min-width: 1.6em;
+  margin-right: 22px !important;
+  text-align: center;
+}
+
+// ── Tag nav list / title-control bottom sheet ───────────────────────────────
+// Same wide-glyph problem in the SelectDropdown + sidebar tag links: the
+// menu-item icon (`.Button-icon`, or the bare `.icon` flarum/tags emits) gets
+// a narrow fixed width for vertical alignment, so "B1G"/"SBC"/etc. sit on top
+// of the label. Widen the box and add breathing room.
+// Nav + dropdown tag links (sidebar list, mobile title-control bottom
+// sheet). Force the icon + label into a flex row with a real gap so the
+// wide conference glyphs don't sit on top of the text. !important because
+// core nav + flarum/tags CSS both load after this file.
+.IndexPage-nav .Button.hasIcon,
+.Dropdown-menu .Button.hasIcon,
+.App-titleControl .Dropdown-menu .Button {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+}
+
+.IndexPage-nav .Button-icon,
+.Dropdown-menu .Button-icon,
+.TagLinkButton .Button-icon,
+.App-titleControl .Dropdown-menu .Button-icon {
+  position: static !important;
+  width: auto !important;
+  min-width: 1.4em;
+  margin: 0 !important;
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.IndexPage-nav .Button-label,
+.Dropdown-menu .Button-label {
+  padding-left: 0 !important;
+}
+
+// ── Discussion list — GridIron Nation-native showcase cards ─────────────────
+//
+// GridIron Nation overrides DiscussionListItem.view() in forum.js so each
+// row renders a GNDiscussionCard instead of Flarum's stock layout. The
+// markup the LESS below targets is this theme's own — no external theme
+// dependency.
+//
+// Card anatomy (matches forum.fbsfb.com production look):
+//   • Vertical primary-color accent strip down the left edge (yard line)
+//   • Header row: avatar + author + date + tag pills + Reply button
+//   • Bold title
+//   • 2-line OP excerpt (muted)
+//   • Embedded "most recent reply" preview chip (avatar + author + snippet)
+//   • "See other N replies" overflow link
+//   • Footer: likes / replies counts with FA icons
+
+.DiscussionList-update { display: none !important; }   // hide realtime "N updates" banner
+
+.GN-showcaseCard {
+  // CSS custom prop for the accent stripe color. Falls through:
+  //   1. --item-tag-color   (set inline by ramon/colored on the parent
+  //                          .DiscussionListItem when the discussion's
+  //                          first tag has a color — cascades to here)
+  //   2. --border-color     theme-aware muted edge color (read state)
+  //   3. @gn-border literal as a final fallback
+  //
+  // The `--unread` modifier (below) overrides the fallback to @gn-primary
+  // so unread rows still get a crimson stripe when no tag is set.
+  --gn-accent-color: var(--item-tag-color, var(--border-color, @gn-border));
+
+  position: relative;
+  background: var(--control-bg, @gn-card);
+  border-radius: @gn-radius;
+  border: 1px solid var(--border-color, @gn-border);
+  margin: 0 0 14px;
+
+  // Accent stripe: an inset box-shadow on the card's left edge. Because
+  // `box-shadow inset` respects `border-radius`, the stripe automatically
+  // curves at the top-left and bottom-left corners — following the card's
+  // outer curve instead of cutting through it.
+  //
+  // We replaced the prior approach (a flex child `.GN-showcaseCard-accent`
+  // with its own `border-radius: 14px 0 0 14px`) because the flex child
+  // was a separate box: at the card's bottom-left corner the 4px strip
+  // would visually overshoot the curve, sticking out past the rounded
+  // edge. The inset shadow lives INSIDE the rounded card, so the curve is
+  // automatic and pixel-perfect.
+  //
+  // Two stacked shadows so the accent doesn't fight the existing
+  // `&:hover { box-shadow: ... }`:
+  box-shadow: inset 4px 0 0 var(--gn-accent-color);
+
+  transition: border-color @gn-transition, box-shadow @gn-transition, transform @gn-transition;
+
+  &:hover {
+    border-color: rgba(@gn-primary, 0.4);
+    box-shadow:
+      inset 4px 0 0 var(--gn-accent-color),
+      0 4px 16px rgba(@gn-primary, 0.08);
+    transform: translateY(-1px);
+  }
+
+  // Unread cards: stripe falls back to @gn-primary (crimson) when no
+  // ramon/colored tag color is set, so the card still reads as
+  // "actionable" even with untagged discussions.
+  &--unread {
+    --gn-accent-color: var(--item-tag-color, @gn-primary);
+  }
+
+  &--sticky {
+    box-shadow:
+      inset 4px 0 0 var(--gn-accent-color),
+      0 0 0 1px rgba(@gn-primary, 0.25);
+  }
+  &--locked { opacity: 0.85; }
+
+  // Legacy `.GN-showcaseCard-accent` element kept in the DOM (for
+  // backward compat with any extension that targets it) but visually
+  // suppressed — the inset box-shadow above handles the accent now.
+  &-accent {
+    display: none;
+  }
+
+  &-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    // Left padding pushes content past the inset box-shadow stripe
+    // (the previous flex layout had a 4px accent column outside the
+    // body — we replicate that gap with padding-left).
+    padding: 16px 18px 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  &-avatar {
+    flex: 0 0 auto;
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+
+    .Avatar {
+      width: 32px;
+      height: 32px;
+      font-size: 0.85rem;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--body-bg, @gn-bg);
+    }
+  }
+
+  &-meta {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    font-size: 0.86rem;
+    color: var(--muted-color, @gn-muted);
+  }
+
+  &-author {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    color: var(--body-color, @gn-text);
+  }
+
+  &-dot { color: var(--muted-color, @gn-muted); opacity: 0.6; }
+
+  &-time { white-space: nowrap; }
+
+  &-tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-left: 4px;
+  }
+
+  &-tagPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 11px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.4;
+    border-radius: 999px;
+    color: var(--gn-tag-color, var(--body-color));
+    background: var(--gn-tag-color-tint, rgba(0, 0, 0, 0.06));
+    text-decoration: none;
+    white-space: nowrap;
+    transition: filter @gn-transition;
+
+    &:hover, &:focus {
+      filter: brightness(1.08);
+      text-decoration: none;
+      color: var(--gn-tag-color, var(--body-color));
+    }
+
+    /*
+     * Bigger FA icon — was 0.7 rem (~11 px), now 0.95 rem (~15 px) so
+     * tag glyphs (helmets, footballs, etc.) actually read at card
+     * scale. Vertical padding bumped to 3 px and `gap` to 6 px so the
+     * icon doesn't crowd the label or overflow the pill.
+     */
+    i { font-size: 0.95rem; line-height: 1; }
+  }
+
+  &-replyBtn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted-color, @gn-muted);
+    background: transparent;
+    border: 1px solid var(--border-color, @gn-border);
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background @gn-transition, color @gn-transition, border-color @gn-transition;
+
+    &:hover, &:focus {
+      background: rgba(@gn-primary, 0.08);
+      color: @gn-primary;
+      border-color: rgba(@gn-primary, 0.3);
+      text-decoration: none;
+    }
+
+    i { font-size: 0.72rem; }
+  }
+
+  // 3-dot moderation dropdown — mirrors Flarum stock DiscussionListItem-controls
+  // but sized down to sit cleanly next to the Reply pill. Only renders when the
+  // actor has any controls available (Reply, Edit, Pin, Lock, Move, Delete, Hide,
+  // Restore, etc.) — guests get nothing and the chip is omitted entirely.
+  &-controls {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+
+    > .Button {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border-radius: 999px;
+      color: var(--muted-color, @gn-muted);
+      background: transparent;
+      transition: background @gn-transition, color @gn-transition;
+
+      &:hover, &:focus {
+        color: @gn-primary;
+        background: rgba(@gn-primary, 0.08);
+      }
+
+      i { font-size: 0.85rem; }
+    }
+  }
+
+  &-titleLink {
+    text-decoration: none;
+    color: inherit;
+    &:hover, &:focus { text-decoration: none; }
+  }
+
+  &-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--heading-color, var(--body-color));
+    margin: 0;
+
+    .GN-showcaseCard--unread & { color: var(--heading-color, @gn-text); }
+  }
+
+  &-excerpt {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--muted-color, @gn-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  &-reply {
+    // No background tint — the chip lives inside the card and should
+    // share the card's surface color, not the page background. Earlier
+    // version painted `background: var(--body-bg)` which made the chip
+    // visibly darker than the surrounding card body in both light and
+    // dark mode (the "different colored area" the user flagged).
+    //
+    // Visual separation now comes from a soft top border + indent
+    // instead of a bg swap — reads as "this is a sub-section" without
+    // breaking the unified card surface.
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 4px;
+    border-top: 1px solid var(--border-color, @gn-border);
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+    transition: background @gn-transition;
+
+    &:hover, &:focus {
+      background: rgba(@gn-primary, 0.04);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .Avatar {
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+      font-size: 0.7rem;
+      border-radius: 50%;
+    }
+  }
+
+  &-replyAvatar { flex: 0 0 auto; }
+
+  &-replyAuthor {
+    font-weight: 700;
+    color: var(--body-color, @gn-text);
+    white-space: nowrap;
+    font-size: 0.86rem;
+  }
+
+  &-replySnippet {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--muted-color, @gn-muted);
+    font-size: 0.86rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-more {
+    align-self: flex-start;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted-color, @gn-muted);
+    text-decoration: none;
+    padding-left: 4px;
+
+    &:hover, &:focus {
+      color: @gn-primary;
+      text-decoration: none;
+    }
+  }
+
+  &-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-top: 2px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color, @gn-border);
+    font-size: 0.82rem;
+    color: var(--muted-color, @gn-muted);
+  }
+
+  &-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    // The likes stat is rendered as a <button> for click-to-like —
+    // strip the default browser chrome (bg, border, padding) so it
+    // shares the visual silhouette of the replies <span>. Cursor +
+    // hover state on the modifier class below make the button feel
+    // interactive without changing its layout.
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+
+    i { font-size: 0.85rem; opacity: 0.8; }
+  }
+
+  // Likes stat in its INTERACTIVE state — cursor, hover, active
+  // styling. The `--liked` modifier flips icon weight to solid + paints
+  // it crimson; `--disabled` muts the cursor for guests / users who
+  // can't like (e.g. their own post when the forum forbids self-like).
+  &-stat--likes {
+    cursor: pointer;
+    transition: color @gn-transition;
+
+    &:hover, &:focus-visible {
+      color: var(--primary-color, @gn-primary);
+      i { opacity: 1; }
+    }
+    &:focus-visible {
+      outline: 2px solid rgba(@gn-primary, 0.35);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  }
+
+  &-stat--liked {
+    color: var(--primary-color, @gn-primary);
+    i { opacity: 1; }
+  }
+
+  &-stat--disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    &:hover, &:focus-visible {
+      color: inherit;
+      i { opacity: 0.8; }
+    }
+  }
+}
+
+// ── Dropdown overlay escalation when open ─────────────────────────────────
+// Flarum's `.Dropdown.open .Dropdown-menu` is `position: absolute` with
+// `z-index: var(--zindex-dropdown)`. When the menu opens on one showcase
+// card, the NEXT card sits in the regular flow with its own stacking
+// context, and the bottom of the open menu gets hidden behind it.
+//
+// Fix: when a row contains an open Dropdown, escalate the entire row's
+// z-index above the rest of the list. The row becomes the stacking
+// parent for the popover, and the menu floats over the next card
+// cleanly. `position: relative` is required so z-index actually applies.
+.DiscussionListItem:has(.Dropdown.open) {
+  position: relative;
+  z-index: calc(~"var(--zindex-dropdown) + 1");
+}
+
+// ── Showcase card responsive trim ────────────────────────────────────────────
+//
+// Three-tier compression matched to layout breakpoints:
+//
+//   ≤ 900px (matches the .Page-container column-flip breakpoint above):
+//     • slightly tighter padding so the card uses more of the column
+//     • forced `max-width: 100%` so the card never overflows
+//       (we saw 898px wide cards at a 375px viewport before this — the
+//       parent column was flex-basis: 0 + content-sized, so the card
+//       was free to claim its natural width and clip the page)
+//     This tier is what users at 768–900 px (tablet portrait + narrow
+//     desktop windows) see — without it, cards stayed at full desktop
+//     padding inside a column layout and looked oversized.
+//
+//   ≤ 767.98px (matches Flarum's @phone breakpoint):
+//     • drop the Reply pill (the title link still routes to the
+//       discussion, and the embedded last-reply chip is enough surface
+//       for tap-to-reply intent)
+//     • title down to 1rem, excerpt 0.88rem
+//
+//   ≤ 540px (phone portrait):
+//     • hide the "See N other replies" link — the snippet conveys the
+//       continued-conversation cue, and the link wraps badly on phones
+//     • drop tag pills that aren't the primary one (we keep the first
+//       to preserve the category cue but the rest were wrapping into a
+//       second row and pushing the meta block tall)
+//     • shrink avatar in last-reply chip to 18 px so the row fits
+//
+// We don't touch the inset stripe (`box-shadow: inset 4px 0 0 ...`) —
+// that scales fine because it's a fixed pixel width regardless of card
+// width.
+@media (max-width: 900px) {
+  .GN-showcaseCard {
+    max-width: 100%;
+    &-body { padding: 14px 16px 12px 20px; gap: 7px; }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .GN-showcaseCard {
+    &-body { padding: 13px 14px 12px 18px; gap: 6px; }
+    &-title { font-size: 1rem; line-height: 1.22; }
+    &-excerpt { font-size: 0.88rem; -webkit-line-clamp: 2; }
+    &-replyBtn { display: none; }   // tighten the meta row on phone
+    &-meta { gap: 4px 6px; font-size: 0.8rem; }
+    &-footer { gap: 12px; font-size: 0.78rem; padding-top: 6px; }
+
+    // Embedded last-reply chip — at mobile width the snippet has no
+    // room left on the row (avatar + author + ellipsised snippet was
+    // clipping ~310 chars of the actual reply text). Switch the chip
+    // to a two-row flex-wrap layout: row 1 = avatar + author + time,
+    // row 2 = the full snippet wrapping to two lines with normal
+    // word-break instead of single-line ellipsis.
+    &-reply {
+      flex-wrap: wrap;
+      row-gap: 4px;
+    }
+    &-replySnippet {
+      // Force onto a new row.
+      flex: 1 0 100%;
+      white-space: normal;
+      overflow: hidden;
+      text-overflow: clip;
+      // Cap at two lines so a wall-of-text reply doesn't blow the
+      // card height past the title/excerpt above.
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      // Indent under the avatar so the snippet visually attaches to
+      // the author chip above (22px avatar + 10px chip gap = 32px).
+      padding-left: 32px;
+      line-height: 1.35;
+    }
+  }
+}
+
+@media (max-width: 540px) {
+  .GN-showcaseCard {
+    &-body { padding: 12px 12px 11px 16px; gap: 5px; }
+    &-title { font-size: 0.95rem; }
+    &-excerpt { font-size: 0.82rem; }
+    &-more { display: none; }
+
+    &-tags {
+      // Only show the first pill on phone — additional pills wrap to a
+      // second line and inflate the meta block.
+      .GN-showcaseCard-tagPill ~ .GN-showcaseCard-tagPill { display: none; }
+    }
+
+    // Embedded last-reply preview chip — keep but tighten typography.
+    &-reply {
+      gap: 8px;
+      .Avatar { width: 18px; height: 18px; font-size: 0.62rem; }
+    }
+    &-replyAuthor, &-replySnippet { font-size: 0.78rem; }
+  }
+}
+
+// New discussion button
+.DiscussionComposer,
+.DiscussionList-header .Button--primary {
+  border-radius: @gn-radius;
+}
+
+// ── Discussion scrubber — centered in its column ────────────────────────────
+// Earlier experiment widened the whole DiscussionPage-nav column to 340px,
+// which looked unbalanced (reverted). Instead leave the column at its default
+// width and just center the scrubber horizontally inside it. Never pad the
+// scrubber's inner rows/track — its slider handle is positioned by JS from the
+// track HEIGHT, so internal padding pushes it out of bounds. Desktop only.
+@media (min-width: 768px) {
+  .DiscussionPage-nav .PostStreamScrubber {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// ── Post stream — playcard chrome (NO grid overrides) ────────────────────────
+//
+// Flarum 2 renders each post as a CSS Grid via .Post-container:
+//   .Post-container { display: grid;
+//                     grid-template-columns: var(--avatar-column-width) 1fr; }
+// where --avatar-column-width defaults to 85px
+// (vendor/flarum/core/less/common/root.less).
+//
+// We deliberately do NOT touch the grid. Earlier attempts at
+// `position: absolute`-ing .Post-side caused every word of replies to
+// stack vertically because the body column got squeezed to ~0 width. Now
+// we only adjust the CHROME (background/border/radius/shadow) and one
+// CSS variable (--avatar-column-width, bumped to 110px so there's more
+// breathing room to the left of the avatar).
+.PostStream-item {
+  margin-bottom: 14px;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+// ── Game-ticket post chrome ──────────────────────────────────────────────────
+//
+// Each post is themed as a stadium ticket:
+//
+//   ╭───────────────╤──────────────────────────────────────────────────╮
+//   │  AVATAR       ┊  HEADER (author · date · controls)               │
+//   │  STUB         ┊                                                  │
+//   │  (perforated) ┊  BODY (post HTML — auto-sized by content)        │
+//   │               ┊                                                  │
+//   ╰───────────────╧──────────────────────────────────────────────────╯
+//
+//   • Vertical DASHED line between the avatar column and the body — the
+//     "tear-here" perforation between ticket stub and ticket main.
+//   • Small filled circles overlapping the top + bottom edges at the
+//     perforation line — the punch-holes that make the stub look like
+//     it can be torn off.
+//   • Subtle warm-paper background tone applied via a tiny linear
+//     gradient — a hair lighter than the body bg, suggests printed
+//     stock without competing with text.
+//   • Bottom border picks up a faint dashed treatment so the post
+//     reads as a single ticket rather than blending into the next one.
+//   • OP posts (Post--by-start-user) get the crimson left border —
+//     same rule we already had, kept below this block.
+//
+// All of this lives on the outer `.Post.CommentPost` and on a single
+// `::before` pseudo-element. We DO NOT touch `.Post-container` or
+// `.Post-side`/`.Post-main` — Flarum 2's CSS Grid handles the column
+// sizing, and any layout override here re-creates the word-stacking
+// bug from earlier in the rename.
+//
+// flarum/messages renders each message as `.Post.Message` (it extends the
+// same base Post component, so it shares the `.Post-side`/`.Post-main` grid).
+// We add it to this selector so DM messages get the EXACT same stadium-ticket
+// chrome — perforation, punch-throughs, stub tint — as forum posts.
+.Post.CommentPost,
+.MessageStream .Post.Message {
+  // Wider avatar column — was 85px (core default), bumped to 110px.
+  // Flarum's `.Post-container` grid uses
+  // `grid-template-columns: var(--avatar-column-width) 1fr`,
+  // so setting the variable here resizes the column without
+  // touching the grid declaration.
+  --avatar-column-width: 110px;
+
+  position: relative;
+  background: var(--control-bg, @gn-card);
+  border: 1px solid var(--border-color, @gn-border);
+  border-radius: @gn-radius;
+  box-shadow: @gn-shadow-sm;
+  transition: box-shadow @gn-transition, border-color @gn-transition;
+
+  // ── Real ticket-stub punch-throughs ─────────────────────────────────────
+  // mask-image with `mask-composite: intersect` literally CUTS the card
+  // background where the holes are — the page bg shows through cleanly,
+  // not a painted-on dark disc.
+  //
+  // How it works:
+  //   - Each gradient is OPAQUE black (#000) everywhere EXCEPT a 24px
+  //     transparent circle at left:0 / right:100%.
+  //   - `mask-composite: intersect` says: the element is visible only
+  //     where ALL masks are opaque. So a hole in EITHER mask hides
+  //     the card at that point.
+  //   - Result: two true cutouts, the page background pours through.
+  //
+  // Border, background, AND background-image (the stub tint) all get
+  // clipped together because mask applies to the whole element box.
+  // box-shadow lives outside the masked region and still works.
+  mask-image:
+    radial-gradient(circle 24px at 0 50%, transparent 22.5px, #000 23px),
+    radial-gradient(circle 24px at 100% 50%, transparent 22.5px, #000 23px);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    radial-gradient(circle 24px at 0 50%, transparent 22.5px, #000 23px),
+    radial-gradient(circle 24px at 100% 50%, transparent 22.5px, #000 23px);
+  -webkit-mask-composite: source-in;
+
+  // 🚨 A mask clips EVERYTHING outside the element's own box, not just its
+  // background. The post's "…" controls menu, and the mention/reply
+  // previews, are absolutely positioned children that open below the
+  // card — so the mask sliced them off at the card's bottom edge and the
+  // menu items could not be seen or clicked (the last post on a page lost
+  // its whole menu). While one of those popups is open the card drops its
+  // mask; the punch-holes come back the moment it closes.
+  &:has(.Dropdown.open),
+  &:has(.Dropdown-menu.in) {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  // Push the header + body text away from the perforation line. The
+  // perforation `::before` sits at left: (avatar-column-width - 2px)
+  // = 108px, and the .Post-main grid track starts at 110px — leaving
+  // only 2px of gap that made the text feel crammed against the
+  // dashes. 18px gives the dashes room to read as a divider rather
+  // than an outline on the heading.
+  .Post-main {
+    padding-left: 18px;
+  }
+
+  // Push the avatar past the left punch hole. The left mask-image
+  // cutout is centered at left:0 with radius 24px, so it bites into
+  // the card from x=-24 to x=24. Without compensating padding, the
+  // avatar (which Flarum renders at ~3px from the post's left edge)
+  // gets sliced in half. 28px padding-left on .Post-side places the
+  // avatar entirely clear of the cutout with a small visual gutter.
+  .Post-side {
+    padding-left: 28px;
+  }
+
+  // ── Ticket-stub tint ─────────────────────────────────────────────────────
+  // Subtle off-color band on the avatar-column side of the perforation,
+  // hard-stopping at the perf line. The stub reads as a clearly distinct
+  // region from the main ticket without competing with text. The
+  // gradient is layered ON TOP of the existing `background` (which is
+  // the solid card color) via `background-image`, so the card stays
+  // theme-aware.
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.035) 0,
+    rgba(0, 0, 0, 0.035) calc(~"var(--avatar-column-width) - 4px"),
+    transparent calc(~"var(--avatar-column-width) - 4px"),
+    transparent 100%
+  );
+
+  &:hover {
+    box-shadow: @gn-shadow-md;
+    border-color: rgba(@gn-primary, 0.22);
+  }
+
+  // ── Ticket perforation ───────────────────────────────────────────────────
+  // Dashed vertical line at the avatar/body column boundary. Uses
+  // `currentColor` so the line picks up legible contrast in both light
+  // and dark mode without hardcoding theme-specific hex.
+  //
+  // CRITICAL: `display: block !important`. Flarum core ships a
+  // clearfix on `.Post:before` / `.Post:after`:
+  //   .Post:before, .Post:after { content: " "; display: table; clear: both }
+  // (see vendor/flarum/core/less/forum/Post.less near the top — it's
+  // applied via the `.clearfix()` mixin on `.Post`). `display: table`
+  // collapses our absolutely-positioned pseudo to a 0-size box and
+  // makes width/height/border invisible. Forcing `display: block`
+  // restores normal pseudo-element rendering.
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: calc(~"var(--avatar-column-width) - 2px");
+    width: 0;
+    border-left: 2px dashed currentColor;
+    opacity: 0.22;
+    pointer-events: none;
+    z-index: 1;
+    clear: none;          // also override the clearfix `clear: both` on :after
+  }
+
+  // The ::after is reserved for the clearfix that Flarum core ships on
+  // `.Post:after { content: " "; display: table; clear: both }`. We
+  // don't repurpose it for punch holes anymore — the mask-image above
+  // does the cutout work directly on the card's own box. We just need
+  // to make sure the clearfix doesn't break our layout (it shouldn't,
+  // since it's a 0-height block by default).
+}
+
+// ── OP color strip (mosaic-style) ────────────────────────────────────────
+// Every post by the discussion's start user gets a crimson left edge.
+// Uses Flarum core's `Post--by-start-user` class. Hoisted out of the
+// .Post.CommentPost block so `border-left` always wins against the
+// `border: 1px solid` shorthand above. Color falls back through
+// --colored-color → --primary-color → @gn-primary.
+.Post.CommentPost.Post--by-start-user {
+  border-left: 3px solid var(--colored-color, var(--primary-color, @gn-primary)) !important;
+}
+
+// First post in the stream gets a slightly stronger shadow tier so the
+// OP reads as the anchor of the discussion. Body sizing / column widths
+// stay untouched — Flarum's grid handles that.
+.PostStream-item--first .Post.CommentPost,
+.PostStream-item:first-child .Post.CommentPost {
+  box-shadow: @gn-shadow-md;
+}
+
+// ── Messages: ticket chrome spacing ──────────────────────────────────────────
+// The ticket chrome itself is shared via the selector in the post block above.
+// The only message-only tweak we keep is breathing room between consecutive
+// ticket-messages (posts get this from core's stream gap; the DM stream
+// doesn't). Layout/positioning is left to Flarum's default.
+.MessageStream .Post.Message {
+  margin-bottom: 12px;
+}
+
+// Composer
+.ComposerBody {
+  border-radius: @gn-radius;
+  box-shadow: @gn-shadow-md;
+}
+
+.Composer {
+  background: @gn-card;
+  border-top: 2px solid @gn-primary;
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+.IndexSidebar {
+  .item {
+    margin-bottom: 4px;
+  }
+}
+
+.IndexSidebar .Nav-item a {
+  border-radius: @gn-radius-sm;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background @gn-transition, color @gn-transition;
+
+  &:hover {
+    background: rgba(@gn-primary, 0.07);
+    color: @gn-primary;
+    text-decoration: none;
+  }
+
+  &.active {
+    background: rgba(@gn-primary, 0.10);
+    color: @gn-primary;
+    font-weight: 700;
+  }
+}
+
+.IndexSidebar .TagsNav-tag a {
+  border-radius: @gn-radius-sm;
+}
+
+// ── User avatar ───────────────────────────────────────────────────────────────
+.Avatar {
+  border-radius: 50%;
+}
+
+// ── Dropdown menus ────────────────────────────────────────────────────────────
+.Dropdown-menu {
+  border-radius: @gn-radius;
+  box-shadow: @gn-shadow-lg;
+  border: 1px solid @gn-border;
+  overflow: hidden;
+}
+
+.Dropdown-item {
+  border-radius: 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  transition: background @gn-transition;
+
+  &:hover {
+    background: rgba(@gn-primary, 0.06);
+    color: @gn-primary;
+  }
+
+  &:first-child { border-radius: @gn-radius @gn-radius 0 0; }
+  &:last-child  { border-radius: 0 0 @gn-radius @gn-radius; }
+}
+
+// ── Modals ────────────────────────────────────────────────────────────────────
+.Modal-content {
+  border-radius: @gn-radius;
+  box-shadow: @gn-shadow-lg;
+  border: 1px solid @gn-border;
+}
+
+.Modal-header {
+  background: @gn-primary;
+  color: #fff;
+  border-radius: @gn-radius @gn-radius 0 0;
+
+  h3 { color: #fff; font-family: 'DM Sans', sans-serif; font-weight: 800; }
+}
+
+// ── Form controls ─────────────────────────────────────────────────────────────
+.FormControl,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  font-family: 'DM Sans', sans-serif;
+  border-radius: @gn-radius-sm;
+  border: 1.5px solid @gn-border;
+  background: @gn-card;
+  color: var(--body-color);
+  transition: border-color @gn-transition, box-shadow @gn-transition;
+
+  &:focus {
+    border-color: @gn-primary;
+    box-shadow: 0 0 0 3px rgba(@gn-primary, 0.12);
+    outline: none;
+  }
+}
+
+// ── Notification badge ────────────────────────────────────────────────────────
+.NotificationsDropdown .Button .badge {
+  background: @gn-primary;
+  color: #fff;
+  border-radius: 999px;
+}
+
+// ── Alerts ────────────────────────────────────────────────────────────────────
+.Alert {
+  border-radius: @gn-radius-sm;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+}
+
+.Alert--success { background: rgba(@gn-online, 0.12); color: darken(@gn-online, 25%); }
+.Alert--error   { background: rgba(@gn-primary, 0.10); color: @gn-primary-dark; }
+
+// ── Badges ────────────────────────────────────────────────────────────────────
+.GroupBadge,
+.UserCard-group {
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+.Pagination .Button {
+  border-radius: @gn-radius-sm;
+}
+
+// ── Loading indicator ─────────────────────────────────────────────────────────
+.LoadingIndicator-container {
+  color: @gn-primary;
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.App-footer {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  color: @gn-muted;
+}
+
+// ── GridIron Nation — sidebar widget shells ───────────────────────────────────
+// Placeholders for Live Scores, Trending, Top Recruits, Online Now widgets
+// (implementations added in Phase 2).
+
+.GN-widget {
+  background: @gn-card;
+  border-radius: @gn-radius;
+  box-shadow: @gn-shadow-sm;
+  border: 1px solid @gn-border;
+  margin-bottom: 12px;
+  overflow: hidden;
+
+  // Header reads as real football leather:
+  //   • A saturated pigskin-brown wash gives the strip a clearly-brown
+  //     base (a deep saddle leather you can read from across the room).
+  //   • A pebbled-dimple SVG layered on top via ::before — small
+  //     darker-brown circles scattered pseudo-randomly across a
+  //     60×60 tile, mimicking the raised grain of real football
+  //     leather. NO football-shape icons. Each circle is a 1.1-1.5 px
+  //     filled disc at 65% opacity so the grain is clearly visible.
+  //   • Title text is WHITE (not the default muted-grey) because the
+  //     brown wash is dark enough that grey-on-brown loses contrast.
+  //     A subtle dark text-shadow keeps the letters crisp even where
+  //     dimples cluster lighter behind them.
+  //
+  // The ::before is `position: absolute; inset: 0` underneath the
+  // flex children, so the title text + icon float above it with full
+  // contrast.
+  &-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid @gn-border;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    // 2 px black outline (four directional offsets + softer drop) so
+    // the white letters pop hard against the saddle-brown wash on
+    // light mode. Opacity ~65% — strong enough to read as a chiseled
+    // letterform but not stenciled lettering. Eight offsets (corners
+    // + cardinals) so the outline doesn't have visible 45° gaps at
+    // 2 px stroke. Dark mode overrides this below — the amber-leather
+    // doesn't need the outline.
+    text-shadow:
+      -2px -2px 0 rgba(0, 0, 0, 0.65),
+       0   -2px 0 rgba(0, 0, 0, 0.65),
+       2px -2px 0 rgba(0, 0, 0, 0.65),
+       2px  0   0 rgba(0, 0, 0, 0.65),
+       2px  2px 0 rgba(0, 0, 0, 0.65),
+       0    2px 0 rgba(0, 0, 0, 0.65),
+      -2px  2px 0 rgba(0, 0, 0, 0.65),
+      -2px  0   0 rgba(0, 0, 0, 0.65),
+       0    2px 2px rgba(0, 0, 0, 0.30);
+    overflow: hidden;
+
+    // Deep pigskin-brown wash. Higher opacity (60→48%) so the strip
+    // reads as a clearly-brown leather band, not a faint tint. Slight
+    // top-to-bottom gradient keeps it from looking like a flat fill.
+    background:
+      linear-gradient(
+        180deg,
+        rgba(139, 69, 19, 0.60) 0%,
+        rgba(139, 69, 19, 0.48) 100%
+      );
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      // Pebbled-leather dimple pattern. 60×60 tile with ~26 small
+      // filled circles at varied positions and radii. Dark pigskin
+      // (#3d2510) at 65% opacity — strong enough that the grain
+      // reads as a tactile leather texture, not a faint speckle.
+      // Inline data-URI keeps it cache-friendly and free of
+      // asset-pipeline plumbing.
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%233d2510' fill-opacity='0.65'%3E%3Ccircle cx='5' cy='4' r='1.4'/%3E%3Ccircle cx='14' cy='9' r='1.1'/%3E%3Ccircle cx='23' cy='3' r='1.5'/%3E%3Ccircle cx='31' cy='8' r='1.2'/%3E%3Ccircle cx='40' cy='11' r='1.4'/%3E%3Ccircle cx='49' cy='5' r='1.3'/%3E%3Ccircle cx='56' cy='14' r='1.5'/%3E%3Ccircle cx='9' cy='17' r='1.3'/%3E%3Ccircle cx='19' cy='22' r='1.4'/%3E%3Ccircle cx='28' cy='18' r='1.1'/%3E%3Ccircle cx='36' cy='25' r='1.5'/%3E%3Ccircle cx='45' cy='20' r='1.3'/%3E%3Ccircle cx='53' cy='28' r='1.4'/%3E%3Ccircle cx='3' cy='30' r='1.2'/%3E%3Ccircle cx='12' cy='35' r='1.5'/%3E%3Ccircle cx='22' cy='39' r='1.3'/%3E%3Ccircle cx='31' cy='33' r='1.4'/%3E%3Ccircle cx='40' cy='37' r='1.2'/%3E%3Ccircle cx='49' cy='41' r='1.5'/%3E%3Ccircle cx='57' cy='45' r='1.3'/%3E%3Ccircle cx='6' cy='47' r='1.4'/%3E%3Ccircle cx='16' cy='52' r='1.2'/%3E%3Ccircle cx='25' cy='48' r='1.5'/%3E%3Ccircle cx='34' cy='55' r='1.3'/%3E%3Ccircle cx='43' cy='51' r='1.4'/%3E%3Ccircle cx='52' cy='57' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 60px 60px;
+      pointer-events: none;
+      // Pattern sits above the brown wash but below the title text.
+      z-index: 0;
+    }
+
+    // Text + icon float above the pattern.
+    > * { position: relative; z-index: 1; }
+
+    // Icon stays crimson on the brown leather — high contrast and
+    // keeps the GridIron Nation brand color visible in the widget
+    // header. White-on-brown would lose the brand accent.
+    .fas {
+      color: @gn-primary;
+      font-size: 0.85rem;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.20);
+    }
+  }
+
+  &-body {
+    padding: 8px 0;
+  }
+}
+
+// ── Live Scores widget — horizontal auto-scroll ticker ──────────────────────
+// Each game is a fixed-width pill; the track holds two back-to-back
+// copies of the game list and animates leftward by -50% so when the
+// first copy slides off the second is already in position. The
+// keyframes loop snaps back to 0 at the end of one cycle for a
+// seamless infinite scroll. Pause on hover so visitors can read a
+// specific score.
+.GN-tickerViewport {
+  position: relative;
+  overflow: hidden;
+
+  // Soft edge fades so games don't pop in/out abruptly at the
+  // viewport edges. Mask the same gradient as the WelcomeHero pattern
+  // for visual continuity.
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 20px,
+    #000 calc(100% - 20px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 20px,
+    #000 calc(100% - 20px),
+    transparent 100%
+  );
+
+  &:hover .GN-tickerTrack {
+    animation-play-state: paused;
+  }
+}
+
+.GN-tickerTrack {
+  display: flex;
+  width: max-content;            // grows to fit the doubled game list
+  animation: gn-ticker linear infinite;
+  // animation-duration is set inline from JS based on game count
+
+  // Respect prefers-reduced-motion — show all games as a static row
+  // and let the viewport scroll horizontally on user interaction.
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    overflow-x: auto;
+  }
+}
+
+@keyframes gn-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.GN-scorecard {
+  flex: 0 0 auto;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin: 6px 8px;
+  gap: 8px;
+  background: var(--control-bg, @gn-surface);
+  border: 1px solid var(--border-color, @gn-border);
+  border-radius: @gn-radius-sm;
+  font-family: 'DM Sans', sans-serif;
+  transition: background @gn-transition, transform @gn-transition;
+
+  &:hover {
+    background: var(--body-bg, @gn-bg);
+    transform: translateY(-1px);
+  }
+
+  &-teams {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 1.02rem;
+    font-weight: 700;
+  }
+
+  &-team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &.is-winning .GN-scorecard-score { color: @gn-primary; }
+  }
+
+  &-logo {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  &-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1.02rem;
+    letter-spacing: 0.01em;
+  }
+
+  &-score {
+    font-weight: 800;
+    font-size: 1.25rem;
+    min-width: 32px;
+    text-align: right;
+    color: var(--body-color);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: @gn-muted;
+    gap: 6px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border-color, @gn-border);
+  }
+
+  &-detail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: right;
+  }
+}
+
+.GN-liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(@gn-online, 0.12);
+  color: darken(@gn-online, 20%);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: @gn-online;
+    border-radius: 50%;
+    animation: gn-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes gn-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+// ── Trending widget ───────────────────────────────────────────────────────────
+.GN-trending {
+  &-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 14px;
+    transition: background @gn-transition;
+
+    &:hover { background: @gn-surface; }
+  }
+
+  &-rank {
+    font-size: 0.78rem;
+    font-weight: 800;
+    min-width: 18px;
+    color: @gn-muted;
+    opacity: 0.3;
+
+    &.is-top { color: @gn-primary; opacity: 1; }
+  }
+
+  &-title {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--body-color);
+    line-height: 1.3;
+  }
+
+  &-meta {
+    font-size: 0.72rem;
+    color: @gn-muted;
+  }
+}
+
+// ── Top Recruits widget ───────────────────────────────────────────────────────
+.GN-recruit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  transition: background @gn-transition;
+
+  &:hover { background: @gn-surface; }
+
+  &-pos {
+    width: 30px;
+    height: 30px;
+    border-radius: @gn-radius-sm;
+    background: @gn-primary;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+
+  &-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: var(--body-color);
+  }
+
+  &-meta {
+    font-size: 0.72rem;
+    color: @gn-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-stars {
+    color: #d97706;
+    font-size: 0.7rem;
+    letter-spacing: -1px;
+  }
+
+  &-commit {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+
+    &--committed   { background: rgba(@gn-online, 0.12);   color: darken(@gn-online, 25%); }
+    &--undecided   { background: rgba(217, 119, 6, 0.12);  color: #92400e; }
+    &--decommitted { background: rgba(@gn-primary, 0.10);  color: @gn-primary-dark; }
+  }
+}
+
+// ── Online Now widget ─────────────────────────────────────────────────────────
+.GN-online {
+  &-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    transition: background @gn-transition;
+
+    &:hover { background: @gn-surface; }
+  }
+
+  &-avatar {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: @gn-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &-dot {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 9px;
+    height: 9px;
+    background: @gn-online;
+    border-radius: 50%;
+    border: 2px solid @gn-card;
+  }
+
+  &-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--body-color);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-status {
+    font-size: 0.72rem;
+    color: @gn-muted;
+  }
+}
+
+// ── Widget shared utility classes ─────────────────────────────────────────────
+
+.GN-widget-loading {
+  padding: 1.5rem;
+  text-align: center;
+  color: @gn-muted;
+  font-size: 1.2rem;
+}
+
+.GN-widget-empty {
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: @gn-muted;
+  font-style: italic;
+}
+
+// ── Trending link reset ───────────────────────────────────────────────────────
+
+a.GN-trending-item {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 14px;
+  transition: background @gn-transition;
+
+  &:hover {
+    background: @gn-surface;
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+// ── Online Now refinements ────────────────────────────────────────────────────
+
+.GN-online-count {
+  font-weight: 400;
+  color: @gn-muted;
+}
+
+.GN-online-initial {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: @gn-primary;
+}
+
+a.GN-online-row {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover { text-decoration: none; color: inherit; }
+}
+
+// ── Page layout: widgets to the RIGHT of the discussion list ─────────────────
+// Flarum 2's PageStructure renders:
+//   div.Page.IndexPage > div.Page-main > div.Page-container.container >
+//     [div.Page-sidebar,     ← contains [IndexSidebar, .GN-widgetSidebar]
+//      div.Page-content]     ← contains contentItems (toolbar, discussionList)
+//
+// To put OUR widget stack on the right of the discussion list, we flip
+// the row direction on .Page-container so .Page-content renders first
+// (left, taking up the remaining flex space) and .Page-sidebar second
+// (right, fixed width). IndexSidebar inside Page-sidebar stays mounted
+// so its IndexSidebar.navItems() can feed the hero pill row — but its
+// visible chrome is hidden because the same nav now lives in the
+// hero.
+.IndexPage .Page-container {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: 1.5rem;
+  // Wider content area on desktop so the showcase cards get more room
+  // (cards fill .Page-content = container − sidebar − gap). Overrides
+  // core's narrower `.container` cap. Fixed px (not a CSS min()/vw): the
+  // theme is compiled by less.php, whose built-in min() errors on mixed
+  // px/vw units and breaks the build. max-width only caps, so narrower
+  // viewports are unaffected; `.container`'s own padding keeps side gaps.
+  max-width: 1360px;
+}
+
+.IndexPage .Page-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.IndexPage .Page-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 1rem;
+}
+
+// ── Desktop left nav sidebar (Members / Tags / etc.) ────────────────────────
+// On non-index pages the IndexSidebar shows as a left nav at the core default
+// width, which truncates long conference names ("Southeastern Conference").
+// Widen it, give every row a fixed-width icon column so the labels line up
+// regardless of glyph width, and let labels wrap as a safety net so nothing is
+// ever cut off. Excludes the IndexPage, whose .Page-sidebar is the 280px
+// widget stack handled above.
+@media (min-width: 768px) {
+  // Scope strictly to the IndexSidebar nav-list (.IndexPage-nav). A bare
+  // `.Page:not(.IndexPage) .Page-sidebar` also matches the DISCUSSION page's
+  // right column (Reply/Follow/Share + scrubber), which broke those controls.
+  // `:has(.IndexPage-nav)` widens only the sidebar that actually holds the
+  // nav list, and the button tweaks below live under .IndexPage-nav so the
+  // discussion controls (.DiscussionPage-nav) are never touched.
+  //
+  // 🚨 `:not(.Page--vertical)` — on a vertical page (the tags page) the
+  // "sidebar" is NOT a left column, it is a full-width strip across the top.
+  // Capping it at 320px squeezed whatever lived there into a 320px box: with
+  // Bespoke's tile nav that was a two-by-two grid of tiles instead of a row,
+  // on the tags page only, and only with both themes enabled.
+  .Page:not(.IndexPage):not(.Page--vertical) .Page-sidebar:has(.IndexPage-nav) {
+    width: 320px;
+    flex-basis: 320px;
+  }
+
+  // Exclude the primary "Start a Discussion" button (.Button--primary):
+  // these flex/icon/wrap tweaks are for the nav LINKS only. Without the
+  // exclusion the primary button's label wrapped to two lines.
+  .Page:not(.IndexPage):not(.Page--vertical) .IndexPage-nav .Button.hasIcon:not(.Button--primary) {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .Page:not(.IndexPage):not(.Page--vertical) .IndexPage-nav .Button:not(.Button--primary) .Button-icon {
+    width: 2.6em !important;
+    min-width: 2.6em;
+    margin: 0 !important;
+    text-align: center;
+    flex: 0 0 auto;
+  }
+
+  .Page:not(.IndexPage):not(.Page--vertical) .IndexPage-nav .Button:not(.Button--primary) .Button-label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+// Hide IndexSidebar's visible chrome — keep it mounted so GNHeroNav can
+// still read from its navItems(). The newDiscussion button inside it is
+// also what GNComposerTrigger delegates clicks to (see open() in the
+// component), so we want it in the DOM but invisible.
+//
+// CRITICAL: only hide on DESKTOP (≥ 768px). On phone widths Flarum
+// nests `.App-titleControl` INSIDE `.IndexPage-nav.sideNav` — that's
+// the SelectDropdown that becomes the center mobile nav menu (All
+// Discussions / tags / custom pages). `display: none` on the parent
+// nav also removes the title-control from the layout tree, even though
+// the title-control itself is `position: fixed` — so we'd lose the
+// entire mobile nav menu. Restrict the hide to ≥ 768px.
+@media (min-width: 768px) {
+  .IndexPage .Page-sidebar .IndexPage-nav.sideNav {
+    display: none;
+  }
+}
+
+// On phone widths, we DO want most of the sidebar nav hidden because
+// the page-title bottom-sheet (App-titleControl) is the user-facing
+// surface — but only the title-control should peek through. Hide the
+// actual `<ul>` list of nav items + the "Start a Discussion" button
+// (Flarum re-renders that for us inside the drawer), letting just the
+// dropdown trigger escape via its own `position: fixed`.
+@media (max-width: 767.98px) {
+  .IndexPage .Page-sidebar .IndexPage-nav.sideNav > ul > li:not(.item-nav) {
+    display: none;
+  }
+  .IndexPage .Page-sidebar .IndexPage-nav.sideNav {
+    // Make the nav itself contribute zero layout space — the title
+    // control inside escapes via position: fixed and the rest is hidden
+    // above, so the wrapper can collapse to 0 height without affecting
+    // the visible title-control.
+    height: 0;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// ── flarum/messages page nav ────────────────────────────────────────────────
+// We keep Flarum's DEFAULT messages layout — a horizontal nav strip (Send a
+// Message + destinations) above the "Messages" hero and the list/thread row —
+// and only fix two ways the GridIron base theme breaks that strip:
+//
+//   1. Something in the cascade caps `.Page-sidebar` to ~320px, so the nav's
+//      inline SelectDropdown (its real width ~700px) gets clipped to a tiny
+//      scrolling box. Force the sidebar + nav to the full content width.
+//   2. The global `.Dropdown-menu { overflow:hidden; border; box-shadow }`
+//      styling clips/boxes the expanded inline nav menu. Neutralize it here so
+//      the destinations read as a flat horizontal strip like the default theme.
+.MessagesPage .Page-sidebar,
+.MessagesPage-nav {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.MessagesPage-nav .Dropdown-menu,
+.MessagesPage-nav .App-titleControl .Dropdown-menu {
+  overflow: visible !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+// The big gap only appears at WIDE (desktop) widths: there Flarum switches
+// `.Page-container` to a flex COLUMN (via Page--cols + Page--vertical), and that
+// column layout opens a large gap between the nav and the content. At narrow
+// widths the container is plain `display:block` and stacks tightly (verified by
+// measurement). Force that block stacking at every width so desktop behaves the
+// same — nav strip on top, content immediately below — and zero the margins
+// Page--cols adds to the sidebar/content.
+.MessagesPage.Page--vertical .Page-container {
+  display: block !important;
+}
+.MessagesPage.Page--vertical .Page-sidebar {
+  // Small top margin so the nav (and its "Send a Message" button) clears the
+  // fixed ~58px header instead of tucking under it — but far less than the 30px
+  // Page--cols adds.
+  margin-top: 16px !important;
+  margin-bottom: 0 !important;
+}
+
+// Squeeze the last vertical space: drop the content's top margin and trim the
+// horizontal nav strip's 15px top/bottom padding so the list + thread sit as
+// high as possible right under the nav.
+.MessagesPage .Page-content {
+  margin-top: 0 !important;
+}
+.MessagesPage-nav {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+// The stadium-ticket message bubbles are themed in the post-chrome block above
+// (shared via `.MessageStream .Post.Message`); nothing else here touches the
+// list/thread layout — it stays as Flarum's default.
+
+// On narrow viewports — widgets stack BELOW the discussion list.
+//
+// `.Page-container` has `flex-direction: row-reverse` + `align-items: flex-start`
+// for desktop (sidebar floats to the right, content takes remaining flex). When
+// we switch to `column` at ≤ 900px:
+//
+//   1. `align-items: flex-start` would keep cross-axis (horizontal) sizing at
+//      content-width, leaving `.Page-content` narrower than the viewport and
+//      letting the showcase cards overflow horizontally. Reset to `stretch`
+//      so the column children fill the viewport width.
+//   2. `flex-direction: column` (NOT column-reverse) plus explicit `order` on
+//      content/sidebar puts the discussion list first and the widgets second.
+//      Column-reverse would also reverse vertical scroll behavior of the
+//      sticky sidebar — explicit order is safer.
+@media (max-width: 900px) {
+  .IndexPage .Page-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .IndexPage .Page-content {
+    order: 1;
+    width: 100%;
+    min-width: 0;
+  }
+  .IndexPage .Page-sidebar {
+    order: 2;
+    width: 100%;
+    position: static;
+    margin-top: 1rem;
+  }
+}
+
+// ── DiscussionHero — decorative tag-icon overlay (avocado pattern) ───────────
+// Injected via extend(DiscussionHero.prototype, 'items', ...) in forum.js.
+// listItems() wraps each entry in <li>, and our <li> is then yanked
+// out of the flow via absolute positioning so the icon overlays the
+// hero's right edge instead of sitting in the badges/title row.
+.DiscussionHero {
+  position: relative;
+  // NO overflow:hidden here — that was clipping the decoration.
+  // The hero is naturally bounded by its container; icons stay inside
+  // because they're absolutely positioned to right:24px, top:50%.
+}
+
+// The <li> wrapper that listItems() puts around our content needs to
+// be unstyled + absolute so the icon overlays the hero. Mithril's
+// listItems() also adds an `item-<key>` className we can grab.
+.DiscussionHero-items > li:has(> .GN-discussionHero-icons),
+.DiscussionHero-items > .item-gn-hero-deco-icons {
+  position: absolute;
+  // Anchored just inside the hero's right edge and right-aligned (see
+  // justify-content on .GN-discussionHero-icons), so wide wordmark glyphs
+  // (fa-kit team logos like fa-lsu) stay fully visible instead of bleeding
+  // off the right of the viewport and getting cut mid-letter.
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  z-index: 1;
+
+  @media (max-width: 480px) {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    right: 8px;
+  }
+}
+
+.GN-discussionHero-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 32px;
+  max-width: 50vw;
+  overflow: visible;
+
+  @media (max-width: 767px) {
+    gap: 18px;
+    max-width: 35vw;
+  }
+}
+
+.GN-discussionHero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(56px, 10vw, 120px);
+  line-height: 1;
+  // Reserve a column per glyph (relative to its own font-size) and center
+  // it, so a wide wordmark glyph's ink can't bleed past its box into the
+  // neighbouring decoration icon. Pairs with the larger `gap` below.
+  min-width: 1.3em;
+  flex: 0 0 auto;
+
+  // Inset the rightmost glyph by exactly its measured right-side ink overflow
+  // (set per-glyph as --gn-deco-inset by gnMeasureDecoInset in forum.js), so
+  // wide wordmark glyphs stay fully on-screen while compact logo glyphs sit
+  // near the edge. Falls back to 0 before the script runs / if it can't
+  // measure. Only the last icon is inset — inter-icon spacing stays intact.
+  &:last-child { margin-inline-end: var(--gn-deco-inset, 0px); }
+
+  // Two opacity strategies, picked at @supports time:
+  //   1. Modern: color-mix blends --gn-deco-color (or white) toward
+  //      transparent at the operator opacity.
+  //   2. Fallback: plain rgba white at the configured alpha.
+  color: rgba(255, 255, 255, var(--gn-deco-opacity, 0.35));
+
+  @supports (color: color-mix(in srgb, red, blue)) {
+    color: color-mix(
+      in srgb,
+      var(--gn-deco-color, #fff) calc(var(--gn-deco-opacity, 0.35) * 100%),
+      transparent
+    );
+  }
+
+  i { display: block; line-height: 1; }
+
+  // Drop shadow lifts the watermark off the hero for depth, and keeps the
+  // glyph readable on light hero backgrounds. Layered (a tight contact
+  // shadow + a softer spread) because the glyph renders semi-transparent —
+  // the filter's alpha is multiplied down by the glyph's own opacity, so a
+  // single faint shadow would be invisible.
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55))
+          drop-shadow(0 8px 22px rgba(0, 0, 0, 0.6));
+}
+
+// Two-icon layout adjusts placement to keep both glyphs readable. Wider gap
+// here than the single-icon case: two big wordmark glyphs side by side need
+// real separation so their ink doesn't visually overlap (the min-width column
+// on .GN-discussionHero-icon above does the rest).
+.GN-discussionHero-icons[data-icon-count='2'] {
+  gap: 44px;
+  .GN-discussionHero-icon { font-size: clamp(44px, 7.5vw, 88px); }
+}
+
+// Make sure hero content reads ABOVE the decoration — title, badges,
+// items row all need higher z-index than the absolute decoration.
+.DiscussionHero > .container,
+.DiscussionHero-title,
+.DiscussionHero-badges {
+  position: relative;
+  z-index: 2;
+}
+
+// Ensure hero text + items stay above the decoration.
+.DiscussionHero .container,
+.DiscussionHero-items {
+  position: relative;
+  z-index: 2;
+}
+
+// ── Discussion hero layout: title above the pills, left-aligned, prominent ──
+// Core renders the `badges` item (priority 10) before the <h1 .DiscussionHero-
+// title>, and Hero centers its content. Stack the items as a left-aligned
+// column, pull the title to the top via `order`, and enlarge it. The deco <li>
+// is absolutely positioned (right:10px) so it's out of this flow.
+.DiscussionHero-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 12px;
+}
+
+.DiscussionHero-items > .item-title {
+  order: -1;
+  margin: 0;
+  width: 100%;
+}
+
+// Selector is intentionally specific (.DiscussionHero h1.DiscussionHero-title,
+// 0-2-1): core ships `.Hero h1 { font-weight: normal; font-size: 22px }` at
+// 0-1-1, which beats a plain `.DiscussionHero-title` (0-1-0) regardless of
+// source order — so font-size/font-weight here were silently losing. flarum/
+// tags also sets `display: inline`; this wins over both.
+.DiscussionHero h1.DiscussionHero-title {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.9rem, 3.8vw, 2.7rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+}
+
+.DiscussionHero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0;
+}
+
+// ── Centred discussion hero (admin: "Discussion hero alignment") ─────────────
+// The column above is left-aligned; centred, every row — title, badges, tag
+// pills — sits on the hero's centre line, and a long tag list wraps outward
+// from the middle instead of hanging off the left of the container.
+// data-gn-hero-align is written on <html> server-side (Content\HeroAlignment).
+[data-gn-hero-align='center'] {
+  .DiscussionHero-items {
+    align-items: center;
+    text-align: center;
+  }
+
+  .DiscussionHero h1.DiscussionHero-title {
+    text-align: center;
+  }
+
+  .DiscussionHero-badges {
+    justify-content: center;
+  }
+
+}
+
+// ── TopRecruitsWidget — round the photo into the same circle as the
+//    position-badge fallback so a CFBD payload with photos looks
+//    identical in shape to one without. 38×38 keeps it inline with the
+//    rest of the widget row.
+.GN-recruit-photo {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;   // bias to the face when CFBD ships a torso shot
+  background: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 0 2px var(--control-bg, #fff);
+}
+
+// ── Social Groups: post menu button visibility ────────────────────────────────
+// The ⋯ button uses --muted-color which can be too low-contrast with our
+// palette (especially in dark mode).  Pin it to --body-color at ~50% so it
+// is always readable but still looks secondary.  The hover state restores full
+// opacity and adds a control-bg pill — identical to the extension's own intent.
+.SGThread-postMenuBtn {
+  color: var(--body-color);
+  opacity: 0.5;
+
+  &:hover {
+    opacity: 1;
+    background: var(--control-bg);
+    color: var(--body-color);
+  }
+}
+
+// ============================================================
+// DARK MODE — MUST remain at the very end of this file.
+//
+// Applied in TWO ways:
+//   1. @media (prefers-color-scheme: dark) — system dark mode
+//   2. body.App--dark-mode                 — Flarum admin dark toggle
+//
+// CSS custom properties are set on body so they cascade to all
+// children (same effect as :root, sufficient for our use-case).
+// ============================================================
+
+// Shared dark-mode mixin (called twice below)
+.gn-dark-theme() {
+  --primary-color:       #e05c5c;
+  --primary-color-dark:  #c03030;
+  --primary-color-light: #f08080;
+
+  --body-bg:       #0c0d10;
+  --control-bg:    #111318;
+  --border-color:  rgba(255, 255, 255, 0.055);
+
+  --body-color:    #dddee8;
+  --muted-color:   #9495a8;
+  --heading-color: #dddee8;
+  --link-color:    #e05c5c;
+  --link-hover-color: #f08080;
+
+  --text-color:      var(--body-color);
+  --text-secondary:  #7e7f92;
+
+  background: #0c0d10;
+  color: #dddee8;
+
+  .App-header {
+    background: #13141a;
+    border-bottom-color: rgba(255, 255, 255, 0.055);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.50);
+  }
+
+  // Our showcase-card override renders `<div class="DiscussionListItem">`
+  // as just a wrapper for `.GN-showcaseCard` — the card has its own bg /
+  // border / shadow / radius, so the wrapper must stay transparent. Same
+  // wrapper-vs-card rule on `.Post` (the post page playcard takes care
+  // of its own chrome via `.Post.CommentPost`, this generic .Post is for
+  // EventPost / DiscussionRenamedPost / other variants).
+  .Post,
+  .Dropdown-menu,
+  .Modal-content,
+  .GN-widget {
+    background: #16171c;
+    border-color: rgba(255, 255, 255, 0.055);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.50), 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+
+  .Post:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.60);
+  }
+
+  .Hero.WelcomeHero,
+  .Hero.IndexPage-hero,
+  .IndexPage-hero {
+    background: linear-gradient(135deg, rgba(120, 10, 10, 0.97) 0%, rgba(30, 2, 2, 0.99) 100%);
+  }
+
+
+  .GN-composerTrigger {
+    background: #16171c;
+    border-color: rgba(255, 255, 255, 0.055);
+
+    &:hover, &:focus-within {
+      border-color: rgba(224, 92, 92, 0.42);
+      box-shadow: 0 4px 16px rgba(224, 92, 92, 0.18);
+    }
+  }
+
+  .FormControl,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    background: #0f1013;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #dddee8;
+
+    &:focus {
+      border-color: #e05c5c;
+      box-shadow: 0 0 0 3px rgba(224, 92, 92, 0.14);
+    }
+  }
+
+  .Modal-header {
+    background: #1a0505;
+  }
+
+  .Composer {
+    background: #16171c;
+    border-top-color: #e05c5c;
+  }
+
+  .ComposerBody {
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.60);
+  }
+
+  .GN-widget-header {
+    border-bottom-color: rgba(255, 255, 255, 0.055);
+    // Dark mode skips the four-direction black outline used on light
+    // mode — the amber-leather wash already has enough darkness for
+    // the white letters to pop. A single soft drop shadow keeps the
+    // text crisp without making it look stenciled.
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+    // Dark-mode wash: richer amber-leather. The light-mode wash uses
+    // saddle-brown (#8B4513), which goes nearly black on a #16171c
+    // surface. Shift toward an orange-amber tone (#c08040-ish) so the
+    // brown reads as "tan leather" rather than collapsing to black.
+    background:
+      linear-gradient(
+        180deg,
+        rgba(192, 128, 64, 0.30) 0%,
+        rgba(192, 128, 64, 0.20) 100%
+      );
+    &::before {
+      // Lighter, more amber dimples so the grain is visible on the
+      // darker wash. Same 60×60 tile + 26-circle layout as light mode.
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23d99963' fill-opacity='0.40'%3E%3Ccircle cx='5' cy='4' r='1.4'/%3E%3Ccircle cx='14' cy='9' r='1.1'/%3E%3Ccircle cx='23' cy='3' r='1.5'/%3E%3Ccircle cx='31' cy='8' r='1.2'/%3E%3Ccircle cx='40' cy='11' r='1.4'/%3E%3Ccircle cx='49' cy='5' r='1.3'/%3E%3Ccircle cx='56' cy='14' r='1.5'/%3E%3Ccircle cx='9' cy='17' r='1.3'/%3E%3Ccircle cx='19' cy='22' r='1.4'/%3E%3Ccircle cx='28' cy='18' r='1.1'/%3E%3Ccircle cx='36' cy='25' r='1.5'/%3E%3Ccircle cx='45' cy='20' r='1.3'/%3E%3Ccircle cx='53' cy='28' r='1.4'/%3E%3Ccircle cx='3' cy='30' r='1.2'/%3E%3Ccircle cx='12' cy='35' r='1.5'/%3E%3Ccircle cx='22' cy='39' r='1.3'/%3E%3Ccircle cx='31' cy='33' r='1.4'/%3E%3Ccircle cx='40' cy='37' r='1.2'/%3E%3Ccircle cx='49' cy='41' r='1.5'/%3E%3Ccircle cx='57' cy='45' r='1.3'/%3E%3Ccircle cx='6' cy='47' r='1.4'/%3E%3Ccircle cx='16' cy='52' r='1.2'/%3E%3Ccircle cx='25' cy='48' r='1.5'/%3E%3Ccircle cx='34' cy='55' r='1.3'/%3E%3Ccircle cx='43' cy='51' r='1.4'/%3E%3Ccircle cx='52' cy='57' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+    }
+  }
+
+  .GN-scorecard-logo { filter: brightness(0.9); }
+
+  .GN-scorecard:hover,
+  .GN-trending-item:hover,
+  .GN-recruit:hover,
+  .GN-online-row:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .GN-online-dot {
+    border-color: #16171c;
+  }
+
+  .Alert--success { background: rgba(78, 196, 106, 0.10); }
+  .Alert--error   { background: rgba(224, 92, 92, 0.12); }
+
+  .IndexSidebar .Nav-item a {
+    &:hover { background: rgba(224, 92, 92, 0.08); }
+    &.active { background: rgba(224, 92, 92, 0.12); }
+  }
+
+  .Button--primary {
+    background: #e05c5c;
+
+    &:hover { background: #c03030; }
+  }
+
+  .GN-liveBadge {
+    background: rgba(78, 196, 106, 0.10);
+  }
+}
+
+// ============================================================
+// Flarum 2 theme-mode application
+//
+// Flarum 2 emits `<html data-theme="...">` indicating the active color
+// scheme. Possible values: `light`, `light-hc`, `dark`, `dark-hc` (plus
+// any admin-installed named variants like `dark-blue`).
+//
+// The 1.x `body.App--dark-mode` / `body.App--light-mode` selectors that
+// the previous version of this stylesheet shipped NEVER match on
+// Flarum 2 — see https://docs.flarum.org/2.x/extend/update-2_0/. That's
+// why dark mode was silently broken: our overrides slept while
+// Flarum's core CSS painted the chrome dark from its own
+// [data-theme^=dark] rules, producing a half-light/half-dark surface.
+//
+// Cascade order (this block MUST stay last in the file):
+//   1. @media (prefers-color-scheme: dark) — only when <html> has no
+//      data-theme yet (anonymous + Flarum's default = "auto").
+//   2. [data-theme^="light"]   → light family (light, light-hc)
+//   3. [data-theme="light-hc"] → light high-contrast tweaks
+//   4. [data-theme^="dark"]    → dark family (dark, dark-hc, dark-*)
+//   5. [data-theme="dark-hc"]  → dark high-contrast tweaks
+// ============================================================
+
+// ── 1. System dark fallback (only when <html> has no data-theme) ─────────────
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]),
+  :root[data-theme=''] {
+    --primary-color:       #e05c5c;
+    --primary-color-dark:  #c03030;
+    --primary-color-light: #f08080;
+    --body-bg:       #0c0d10;
+    --control-bg:    #111318;
+    --border-color:  rgba(255, 255, 255, 0.055);
+    --body-color:    #dddee8;
+    --muted-color:   #9495a8;
+    --heading-color: #dddee8;
+    --link-color:    #e05c5c;
+    --link-hover-color: #f08080;
+    --text-color:      var(--body-color);
+    --text-secondary:  #7e7f92;
+  }
+
+  :root:not([data-theme]) body,
+  :root:not([data-theme]) .App,
+  :root[data-theme=''] body,
+  :root[data-theme=''] .App {
+    .gn-dark-theme();
+  }
+}
+
+// ── 2. Light family ──────────────────────────────────────────────────────────
+[data-theme^='light'] {
+  --primary-color:       @gn-primary;
+  --primary-color-dark:  @gn-primary-dark;
+  --primary-color-light: @gn-primary-light;
+  --body-bg:      @gn-bg;
+  --control-bg:   @gn-surface;
+  --border-color: @gn-border;
+  --body-color:   @gn-text;
+  --muted-color:  @gn-muted;
+  --heading-color:@gn-text;
+  --link-color:   @gn-primary;
+  --link-hover-color: @gn-primary-dark;
+  --text-color:      var(--body-color);
+  --text-secondary:  @gn-secondary;
+
+  background: @gn-bg;
+  color: @gn-text;
+
+  .App-header {
+    background: #fff;
+    border-bottom-color: @gn-border;
+    box-shadow: @gn-shadow-sm;
+  }
+
+  // DiscussionListItem deliberately excluded — see dark-mode comment above:
+  // the wrapper must stay transparent so the showcase card's surface
+  // reads cleanly without a wrapper-bg strip leaking through.
+  .Post,
+  .Dropdown-menu,
+  .Modal-content,
+  .GN-widget {
+    background: @gn-card;
+    border-color: @gn-border;
+    box-shadow: @gn-shadow-sm;
+  }
+
+  .FormControl,
+  input[type="text"], input[type="email"], input[type="password"],
+  input[type="search"], textarea, select {
+    background: @gn-card;
+    border-color: @gn-border;
+    color: @gn-text;
+  }
+}
+
+// ── 3. Light high-contrast ───────────────────────────────────────────────────
+[data-theme='light-hc'] {
+  --border-color: #000;
+  --body-color:   #000;
+  --muted-color:  #333;
+  --link-color:   #8b0000;
+  --link-hover-color: #5a0000;
+
+  .DiscussionListItem,
+  .Post,
+  .Dropdown-menu,
+  .Modal-content,
+  .GN-widget {
+    border-color: #000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+
+  .Button--primary {
+    background: #8b0000;
+    &:hover { background: #5a0000; }
+  }
+}
+
+// ── 4. Dark family ───────────────────────────────────────────────────────────
+[data-theme^='dark'] {
+  --primary-color:       #e05c5c;
+  --primary-color-dark:  #c03030;
+  --primary-color-light: #f08080;
+  --body-bg:       #0c0d10;
+  --control-bg:    #111318;
+  --border-color:  rgba(255, 255, 255, 0.055);
+  --body-color:    #dddee8;
+  --muted-color:   #9495a8;
+  --heading-color: #dddee8;
+  --link-color:    #e05c5c;
+  --link-hover-color: #f08080;
+  --text-color:      var(--body-color);
+  --text-secondary:  #7e7f92;
+
+  body, .App { .gn-dark-theme(); }
+}
+
+// ── 5. Dark high-contrast ────────────────────────────────────────────────────
+[data-theme='dark-hc'] {
+  --border-color: rgba(255, 255, 255, 0.32);
+  --body-color:   #fff;
+  --muted-color:  #d6d8e0;
+  --link-color:   #ff7878;
+  --link-hover-color: #ffa0a0;
+
+  .DiscussionListItem,
+  .Post,
+  .Dropdown-menu,
+  .Modal-content,
+  .GN-widget {
+    border-color: rgba(255, 255, 255, 0.32);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.70);
+  }
+
+  .Button--primary {
+    background: #ff7878;
+    color: #1a0303;
+    &:hover { background: #ffa0a0; }
+  }
+}
+
+// ============================================================
+// ramon/colored extension compatibility (verified against v1.3.1)
+//
+// Live-probed surfaces that the extension uses:
+//   <html>:
+//     data-colored-header="true|false"      — turns header bg tint on/off
+//     data-colored-border="left|full|off"   — discussion list border style
+//     class .colored--instant               — temporary "no transitions"
+//                                              flag while the JS swaps
+//                                              color vars between tags
+//   <body>:
+//     class .colored--active                — set on tagged pages; gates
+//                                              the primary/link/button
+//                                              color overrides
+//   Per-element inline CSS vars:
+//     --colored-color     → the active tag's hex color
+//     --colored-contrast  → white/black depending on contrast
+//     --item-tag-color    → per-DiscussionListItem tag color
+//                            (consumed by the border styles below)
+//
+// GridIron Nation already plays well with the BODY-level primary color
+// override — ramon/colored sets --primary-color on body.colored--active,
+// and our LESS uses @gn-primary (a literal crimson) only for our own
+// branding surfaces (WelcomeHero gradient, composer trigger CTA).
+// Flarum core's primary-color-driven elements (form focus rings, link
+// color, etc.) pick up the tag color cleanly.
+//
+// The discussion-list integration is what needs explicit support:
+// ramon/colored renders `border-left: 3px solid var(--item-tag-color)`
+// (or full border) on each DiscussionListItem. Our default rule sets
+// `border: 0`, which would wipe it out. Re-establish per-mode below
+// so the colored stripe shows through.
+// ============================================================
+
+// ── DiscussionList wrapper reset ─────────────────────────────────────────
+// Our showcase card supplies its OWN background, border, radius, and
+// shadow on `.GN-showcaseCard`. The `<div class="DiscussionListItem">`
+// wrapper we render must contribute nothing visually — its only job is
+// to host the inline `--item-tag-color` custom prop that ramon/colored
+// sets via its extender. Anything else (white-ish bg from theme blocks,
+// 15px wrapper padding from core, double colored bar from ramon/colored's
+// border-left) leaks through and creates the "different colored strip"
+// the user sees on the card's left edge.
+.DiscussionListItem {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+// ramon/colored paints a 3px `border-left: solid var(--item-tag-color)`
+// on .DiscussionListItem when `data-colored-border=left` is active. That
+// would draw a second parallel colored bar outside our internal accent
+// strip. Override to zero — only our card-internal accent paints.
+html[data-colored-border='left'] .DiscussionListItem {
+  border-left: 0;
+}
+
+// Left-stripe mode: the card's `--gn-accent-color` already defaults to
+// `var(--item-tag-color, ...)` so ramon/colored's inline-style
+// `--item-tag-color` on the parent DiscussionListItem cascades down and
+// the inset box-shadow paints with the tag color automatically. No
+// extra selectors needed — the cascade does the work.
+//
+// (Previously we recolored `.GN-showcaseCard-accent` here, but that
+// element is now display:none — the inset box-shadow on the card
+// handles the stripe and naturally follows the border-radius.)
+
+// Full-border mode: ring the card with the tag color, kill the 4px
+// bottom margin so consecutive bordered rows don't read as double-thick.
+html[data-colored-border='full'] .DiscussionListItem {
+  margin-bottom: 6px;
+}
+html[data-colored-border='full'] .GN-showcaseCard {
+  border-color: var(--item-tag-color, var(--border-color, transparent));
+}
+
+// Suppress every transition + animation while ramon/colored is
+// mid-swap (.colored--instant flag is on for 2 frames) so the admin
+// flipping tags doesn't see intermediate color states fading in.
+html.colored--instant,
+html.colored--instant * {
+  transition: none !important;
+  animation-duration: 0s !important;
+}
